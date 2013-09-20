@@ -1,0 +1,67 @@
+純LISPで関数作ってみるテスト
+
+eqはシンボル同士の評価しかできない、引数にリストが来るとエラー
+
+(label get-first-nonnil (lambda (x) (cond ((atom x) x) ((car x) (car x)) (T (get-first-nonnil (cdr x))))))
+(label or (lambda (x . y) (get-first-nonnil (cons x y))))
+;↑全引数を評価してからorするので普通のlispのorと違うわヴォケ
+;マクロなら構文解析時に展開する必要があるのだが
+;(or a b c) を (cond (a a) (b b) (T c))とかにしてしまうとaが真のときaを２回評価することになって違う
+;つまりマクロでcondには展開できない・・・(もしaに副作用があった場合困るわけで)
+;(たとえばインクリメント系のしょりだったり (label a (++ a)) とか
+
+(label if (lambda (x y z) (cond (x y) ('T z))))
+;↑全引数を評価してからifするのでthen式もelse式も先に同時評価されてしまい普通のlispのifと違うわヴォケ
+;(if a b c) を (cond (a b) (T c)) に構文解析時にマクロとして展開しないとアカン
+
+;nilならT nil以外ならnil
+(label not (lambda (x) (cond (x nil) (t t))))
+
+;リストとか同じ構造ならT 違うならNIL
+(label equal (lambda (x y) (cond ((atom x) (cond ((atom y) (eq x y)) (T nil))) ((atom y) nil) ((equal (car x) (car y)) (equal (cdr x) (cdr y))) (T nil))))
+
+;引数をリストにする
+(label list (lambda (x . y) (cons x y)))
+
+;リストの最後の値を取る
+(label last (lambda (x) (cond ((atom x) 'nil) ((atom (cdr x)) x) ('t (last (cdr x))))))
+
+;全引数を評価したあと最後の引数を返す
+(label progn (lambda (x . y) (car (last (cons x y)))))
+
+;progn テスト
+;(progn (label a 'k) (label b 's) (cons a b)) ; -> (K . S)
+
+(label caar (lambda (x) (car (car x))))
+(label caaar (lambda (x) (car (car (car x)))))
+(label caaaar (lambda (x) (car (car (car (car x))))))
+(label caaadr (lambda (x) (car (car (car (cdr x))))))
+(label caadr (lambda (x) (car (car (cdr x)))))
+(label caadar (lambda (x) (car (car (cdr (car x))))))
+(label caaddr (lambda (x) (car (car (cdr (cdr x))))))
+
+(label cadr (lambda (x) (car (cdr x))))
+(label cadar (lambda (x) (car (cdr (car x)))))
+(label cadaar (lambda (x) (car (cdr (car (car x))))))
+(label cadadr (lambda (x) (car (cdr (car (cdr x))))))
+(label caddr (lambda (x) (car (cdr (cdr x)))))
+(label caddar (lambda (x) (car (cdr (cdr (car x))))))
+(label cadddr (lambda (x) (car (cdr (cdr (cdr x))))))
+
+(label cdar (lambda (x) (cdr (car x))))
+(label cdaar (lambda (x) (cdr (car (car x)))))
+(label cdaaar (lambda (x) (cdr (car (car (car x))))))
+(label cdaadr (lambda (x) (cdr (car (car (cdr x))))))
+(label cdadr (lambda (x) (cdr (car (cdr x)))))
+(label cdadar (lambda (x) (cdr (car (cdr (car x))))))
+(label cdaddr (lambda (x) (cdr (car (cdr (cdr x))))))
+
+(label cddr (lambda (x) (cdr (cdr x))))
+(label cddar (lambda (x) (cdr (cdr (car x)))))
+(label cddaar (lambda (x) (cdr (cdr (car (car x))))))
+(label cddadr (lambda (x) (cdr (cdr (car (cdr x))))))
+(label cdddr (lambda (x) (cdr (cdr (cdr x)))))
+(label cdddar (lambda (x) (cdr (cdr (cdr (car x))))))
+(label cddddr (lambda (x) (cdr (cdr (cdr (cdr x))))))
+
+

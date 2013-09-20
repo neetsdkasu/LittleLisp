@@ -1,0 +1,44 @@
+èÉlisp êîílë´ÇµéZ
+
+
+(label 0 '0)
+(label 1 '1)
+(label 2 '2)
+(label 3 '3)
+(label 4 '4)
+(label 5 '5)
+(label 6 '6)
+(label 7 '7)
+(label 8 '8)
+(label 9 '9)
+
+(label add1 
+	(lambda (x)
+		(cond 
+			((atom x)
+				(cond 
+					((eq x 0) 1) ((eq x 1) 2)
+					((eq x 2) 3) ((eq x 3) 4) ((eq x 4) 5) ((eq x 5) 6)
+					((eq x 6) 7) ((eq x 7) 8) ((eq x 8) 9) ((eq x 9) '(0 . 1))
+					('T 'nil)
+				)
+			)
+			('T 
+				((lambda (y) (cons (cond ((atom y) y) ('T (car y))) (cond ((atom y) (cdr x)) ('T (add1 (cdr x)))))) (add1 (car x)))
+			)
+		)
+	)
+)
+
+
+(label add1 (lambda (x) (cond ((atom x) (cond ((eq x 0) 1) ((eq x 1) 2) ((eq x 2) 3) ((eq x 3) 4) ((eq x 4) 5) ((eq x 5) 6) ((eq x 6) 7) ((eq x 7) 8) ((eq x 8) 9) ((eq x 9) '(0 . 1)) ('T 'nil) )) ('T ((lambda (y) (cons (cond ((atom y) y) ('T (car y))) (cond ((atom y) (cdr x)) ('T (add1 (cdr x)))))) (add1 (car x))))))))
+(label add2 (lambda (x) (add1 (add1 x))))
+(label add3 (lambda (x) (add2 (add1 x))))
+(label add4 (lambda (x) (add3 (add1 x))))
+(label add5 (lambda (x) (add4 (add1 x))))
+(label add6 (lambda (x) (add5 (add1 x))))
+(label add7 (lambda (x) (add6 (add1 x))))
+(label add8 (lambda (x) (add7 (add1 x))))
+(label add9 (lambda (x) (add8 (add1 x))))
+(label add10 (lambda (x) (cond ((atom x) (cons x 1)) ('T (cons (car x) (add1 (cdr x)))))))
+

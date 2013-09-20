@@ -1,0 +1,441 @@
+純lisp自分でevalを考える
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;ユーティリティ関数
+(label not (lambda (x) (cond (x (quote NIL)) ((quote T) (quote T)))))
+(label and (lambda (x y) (cond (x y) ((quote T) (quote NIL)))))
+(label equal (lambda (x y) (cond ((and (atom x) (atom y)) (eq x y)) ((and (not (atom x)) (not (atom y))) 
+	(and (equal (car x) (car y)) (equal (cdr x) (cdr y)))) ((quote T) (quote NIL)))))
+
+(label cadr (lambda (x) (car (cdr x))))
+(label cddr (lambda (x) (cdr (cdr x))))
+(label cdddr (lambda (x) (cdr (cdr (cdr x)))))
+(label caddr (lambda (x) (car (cdr (cdr x)))))
+(label cdadr (lambda (x) (cdr (car (cdr x)))))
+(label cddadr (lambda (x) (cdr (cdr (car (cdr x))))))
+(label caar (lambda (x) (car (car x))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(cons (quote a) (cons (quote b) (quote NIL)))
+などを実行する場合は
+(exec list)
+(exec (quote (cons (quote a) (cons (quote b) (quote NIL)))))
+(atom list) -> (eval list (quote NIL))
+(quote T) -> (eval (car list) (cdr list))
+などとする
+
+;eval 定義
+(eval list args)
+引数list 	シンボルの場合は引数argsとリストにして二段階目で処理する（LAMBDA関数対策）
+引数args 	再帰でリストに追加してくことで変数を実現、実引数をリストで渡す
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;quote		(quote a)
+
+;第一段階 (eval quote (a))
+(eval (quote quote) (quote (a)))
+引数list	quote
+引数args	(a)
+(atom list) ->
+	(eq list (quote QUOTE)) -> (eval (cons list args) args)
+
+;第二段階 (eval (quote a) (a))
+引数list	(quote a)
+引数args		(a)
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote QUOTE)) -> (cadr list) ; (cadr list) => a
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;atom 		(atom (quote (a b)))
+
+;第一段階 (eval atom ((quote (a b))))
+(eval (quote atom) (quote ((quote (a b)))))
+引数list	atom
+引数args	((quote (a b)))
+(atom list) ->
+	(eq list (quote ATOM)) -> (eval (cons list args) args)
+
+;第二段階 (eval (atom (quote (a b))) ((quote (a b))))
+引数list	(atom (quote (a b))) ; (atom . ((quote . ((a . (b . NIL)) . NIL)) . NIL))
+引数args	((quote (a b)))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote ATOM)) -> (atom (eval (cadr list) args)) ; (cadr list) => (quote (a b))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;car		(car (quote (a b c)))
+
+;第一段階 (eval car ((quote (a b c))))
+(eval (quote car) (quote ((quote (a b c)))))
+引数list	car
+引数args	((quote (a b c)))
+(atom list) ->
+	(eq list (quote CAR)) -> (eval (cons list args) args)
+
+;第二段階 (eval (car (quote (a b c))) ((quote (a b c))))
+引数list	(car (quote (a b c))) ; (car . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
+引数args	((quote (a b c)))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote CAR)) -> (car (eval (cadr list) args)) ; (cadr list) => (quote (a b c))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;cdr		(cdr (quote (a b c)))
+
+;第一段階 (eval cdr ((quote (a b c))))
+引数list	cdr
+引数args	((quote (a b c)))
+(atom list) ->
+	(eq list (quote CDR)) -> (eval (cons list args) args)
+
+;第二段階 (eval (cdr (quote (a b c))) ((quote (a b c))))
+引数list	(cdr (quote (a b c))) ; (cdr . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
+引数args	((quote (a b c)))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote CDR)) -> (cdr (eval (cadr list) args)) ; (cadr list) => (quote (a b c))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;eq			(eq (quote a) (quote b))
+
+;第一段階 (eval (quote eq) (quote ((quote a) (quote b))))
+引数list	eq
+引数args	((quote a) (quote b))
+(atom list) ->
+	(eq list (quote EQ)) -> (eval (cons list args) args)
+
+;第二段階 (eval (eq (quote a) (quote b)) ((quote a) (quote b)))
+引数list	(eq (quote a) (quote b))
+引数args	((quote a) (quote b))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote EQ)) -> (eq (eval (cadr list) args) (eval (caddr list) args))
+			; (cadr list) => (quote a), (caddr list) => (quote b)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;cons		(cons (quote a) (quote b))
+
+;第一段階 (eval (quote cons) (quote ((quote a) (quote b))))
+引数list	cons
+引数args	((quote a) (quote b))
+(atom list) ->
+	(eq list (quote CONS)) -> (eval (cons list args) args)
+
+;第二段階 (eval (cons (quote a) (quote b)) ((quote a) (quote b)))
+引数list	(cons (quote a) (quote b))
+引数args	((quote a) (quote b))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote CONS)) -> (cons (eval (cadr list) args) (eval (caddr list) args))
+			; (cadr list) => (quote a), (caddr list) => (quote b)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;cond		(cond ((f a) b) ((f c) d) ((quote T) e))
+
+;第一段階 (eval cond (((f a) b) ((f c) d) ((quote T) e)))
+(eval (quote cond) (quote (((f a) b) ((f c) d) ((quote T) e))))
+引数list	cond
+引数args	(((f a) b) ((f c) d) ((quote T) e))
+(atom list) ->
+	(eq list (quote COND)) -> (eval (cons list args) args)
+
+;第二引数 (eval (cond ((f a) b) ((f c) d) ((quote T) e)) (((f a) b) ((f c) d) ((quote T) e)))
+引数list	(cond ((f a) b) ((f c) d) ((quote T) e))
+引数args	(((f a) b) ((f c) d) ((quote T) e))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote COND)) -> (cond ((eval (caadr list) args) (eval (cdadr list) args)) ((quote T) (eval (cons (quote COND) (cddr list)) args)))
+			; (caadr list) => (f a), (cdadr list) => b, (cddr list) => (((f c) d) ((quote T) e))
+			;この方法だと (f a) で変数が生成される場合に b の処理にその変数が反映されない 代わりの処理が必要
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;lambda		(lambda (x y) (cons (cons x x) y))
+
+;第一段階 (eval lambda ((x y) (cons (cons x x) y)))
+(eval (quote lambda) (quote ((x y) (cons (cons x x) y))))
+引数list	lambda
+引数args	((x y) (cons (cons x x ) y))
+(atom list) ->
+	(eq list (quote LAMBDA) -> (cons list args)
+		;lambdaの定義を返す (lambda (x y) (cons (cons x x) y))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;label		(label a (quote (b c d)))
+
+;第一段階 (eval label (a (quote (b c d))))
+(eval (quote label) (quote (a (quote (b c d)))))
+引数list	label
+引数args	(a (quote (b c d)))
+(atom list) ->
+	(eq list (quote LABEL)) -> (eval (cons list args) args)
+
+;第二段階 (eval (label a (quote (b c d))) (a (quote (b c d))))
+引数list	(label a (quote (b c d)))
+引数args	(a (quote (b c d)))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote LABEL)) -> 
+			(atom (cadr list)) -> (cadr list) ; (cadr list) => a
+				; 変数をどう管理するか
+			;(cons (cadr list) (eval (cddr list) args)) ; => (a . (b c d)) は作れるが・・・
+			;どうやってargsを引き継ぐんだ？戻り値にするのか？
+
+;一回のevalに渡せるlabelの数はどの程度？labelの有効範囲は？
+;(cond ((label a 'b) (cons a a)) ('T a)) ; この最後のaでlabelの値は有効？
+;(cons (cons (label a 'XX) (label b 'YY)) (b a)) ;こんなのどうするんだ
+;(label a (cons (label c 'ccc) (label c 'xxx))) ;こんなバカみたいのも考えられる
+
+;考えられる策として先にlabel文だけ抽出しては変数リストに変換して戻り値にする関数が必要とかか？
+;
+
+;変数のリスト
+;  ((ING . c) . (((1 2 3) . b)  . (((x y z) . a) . (末尾NILの純リストならNILでもなんでも))))
+
+;findvar 変数リストargsに変数名symbolがあればT、なければNILを返す
+(label findvar (lambda (args symbol)
+	(cond 
+		((not (atom args)) (cond
+			((not (atom (car args))) (cond
+				((atom (cdar args)) (cond
+					((eq (cdar args) symbol)  (quote T))
+					((quote t) (findvar (cdr args) symbol))))
+				((quote t) (quote NIL))))
+			((quote t) (quote NIL))))
+		((quote t) (quote NIL)))
+	))
+
+;repvar 変数リストargsに変数名symbolがあれば一番手前にあるその変数の値をvalueに置き換えた変数リストを返す、なければ元の変数リストをそのまま返す
+(label repvar (lambda (args symbol value)
+	(cond 
+		((not (atom args)) (cond
+			((not (atom (car args))) (cond
+				((atom (cdar args)) (cond
+					((eq (cdar args) symbol)  (cons (cons value symbol) (cdr args)))
+					((quote t) (cons (car args) (repvar (cdr args) symbol value)))))
+				((quote t) args)))
+			((quote t) args)))
+		((quote t) args))
+	))
+
+;delvar 変数リストargsに変数名symbolがあれば一番手前にあるその名の変数を削除した変数リストを返す、なければ元の変数リストをそのまま返す
+(label delvar (lambda (args symbol)
+	(cond 
+		((not (atom args)) (cond
+			((not (atom (car args))) (cond
+				((atom (cdar args)) (cond
+					((eq (cdar args) symbol)  (cdr args))
+					((quote t) (cons (car args) (delvar (cdr args) symbol)))))
+				((quote t) args)))
+			((quote t) args)))
+		((quote t) args))
+	))
+
+;addvar 変数リストargsの一番手前に変数名symbol値valueの変数を追加する
+(label addvar (lambda (args symbol value)
+	(cons (cons value symbol) args)))
+
+;setvar 変数リストargsに変数名symbolがあれば値をvalueに置き換える、なければ新しく追加する
+(label setvar (lambda (args symbol value)
+	(cond 
+		((findvar args symbol) (repvar args symbol value))
+		((quote t) (addvar args symbol value)))
+	))
+
+;getvar 変数リストargsに変数名symbolがあれば一番手前にあるその変数の値を返す、なければシンボルERRORを返す
+(label getvar (lambda (args symbol)
+	(cond 
+		((not (atom args)) (cond
+			((not (atom (car args))) (cond
+				((atom (cdar args)) (cond
+					((eq (cdar args) symbol)  (caar args))
+					((quote t) (getvar (cdr args) symbol))))
+				((quote t) (quote ERROR))))
+			((quote t) (quote ERROR))))
+		((quote t) (quote ERROR)))
+	))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;変数		var
+
+第一段階 (eval var (NIL))
+(eval (quote var) (quote (NIL)))
+引数list	var
+引数args	(NIL)
+	; ここでargsに格納されている値を返せばいいのか？
+	; いや、ここで返すべきだな
+
+;関数		(func (quote a) (quote b))
+
+第一段階 (eval func ((quote a) (quote b)))
+(eval (quote func) (quote ((quote a) (qoute b))))
+引数list	func
+引数args	((quote a) (quote b))
+(atom list) ->
+	;funcを取り出して(lambda関数)で引数とconsするのか？
+
+第二段階 (eval (func (quote a) (quote b)) ((quote a) (quote b))
+引数list	(func (quote a) (quote b))
+引数args	((quote a) (quote b))
+	;この時点でargsにfuncの情報がなけりゃどうしようもないんだが
+	;funcの値(lambda関数)を取り出して引数とconsするか？
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;lambda関数		((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
+
+第一段階 (eval (lambda (x y) (cons (cons x x) y)) ((quote A) (quote B)))
+(eval (quote (lambda (x y) (cons (cons x x) y)) (quote ((quote A) (quote B)))))
+引数list	(lambda (x y) (cons (cons x x) y))
+引数args	((quote A) (quote B))
+(not (atom list)) ->
+	(atom (car list)) ->
+		(eq (car list) (quote LAMBDA)) -> (cons list args)
+
+第二段階 (eval ((lambda (x y) (cons (cons x x) y)) (quote A) (quote B)) ((quote A) (quote B)))
+引数list	((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
+引数args	((quote A) (quote B))
+		;(cadr list)で仮引数(x y) (cdddr list)で実引数((quote A) (quote B))
+		;(caddr list)で関数本体
+		;仮引数と実引数を結び付けargsに格納するかで(eval 関数本体 変数リスト)とかにするべきか
+
+		;となるとargsが変数リストか引数リストか、何らかの区別が必要か？
+		;もしかして第一段階のeval呼び出しはargsはいらないか？
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;下記の定義ではアカン　（変数が処理できない）
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+:eval 定義
+(eval list)
+
+;quote
+(eval (qute (quote a))
+
+引数list (quote a) ; (quote . (a . NIL))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote QUOTE)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL))  ; T (NILなら引数２以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (cadr list)
+
+
+;atom
+(eval (quote (atom (quote a))))
+
+引数list (atom (quote a)) ; (atom . ((quote . (a . NIL)) . NIL))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote ATOM)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; T (NILなら引数２以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (atom (eval (cadr list))) ; このevalの呼び方だと変数を渡せない
+
+
+;eq
+(eval (quote (eq (quote a) (quote b))))
+
+引数list (eq (quote a) (quote b)) ; (eq . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote EQ)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; NIL (Tなら引数１のエラー、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cdddr list) (quote NIL)) ; T (NILなら引数３以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (eq (eval (cadr list)) (eval (caddr list))) ; このevalの呼び方だと変数を渡せない
+
+
+;cons
+(eval (quote (cons (quote a) (quote b))))
+
+引数list (cons (quote a) (quote b)) ; (cons . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote CONS)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; NIL (Tなら引数１のエラー、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cdddr list) (quote NIL)) ; T (NILなら引数３以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (cons (eval (cadr list)) (eval (caddr list))) ; このevalの呼び方だと変数を渡せない
+
+
+;car
+(eval (quote (car (quote (a b c)))))
+
+引数list (car (quote (a b c))) ; (car . (quote . ((a . (b . (c . NIL))) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote CAR)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; T (NILなら引数２以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (car (eval (cadr list))) ; このevalの呼び方だと変数を渡せない
+
+
+
+;cdr
+(eval (quote (cdr (quote (a b c)))))
+
+引数list (cdr (quote (a b c))) ; (cdr . (quote . ((a . (b . (c . NIL))) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote CAR)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; T (NILなら引数２以上のエラー、しかし任意のエラーの発生は出来ない)
+戻り値 (cdr (eval (cadr list))) ; このevalの呼び方だと変数を渡せない
+
+
+;label
+(eval (quote (label a (quote b))))
+
+引数list (label a (quote b)) ; (label . (a . ((quote . (b . NIL)) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote LABEL)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; NIL (Tなら引数１のエラー、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cdddr list) (quote NIL)) ; T (NILなら引数３以上のエラー、しかし任意のエラーの発生は出来ない)
+条件6 (atom (cadr list)) ; T (NILなら変数名がシンボルじゃない、しかし任意のエラーの発生は出来ない))
+戻り値 (cadr list)
+必要な処理 (eval (caddr list)) の結果保存 ; このevalの呼び方だと変数を渡せない
+
+
+;lambda
+(eval (quote (lambda (x) (cons x x))))
+
+引数list (lambda (x) (cons x x)) ; (lambda . ((x . NIL) . ((cons . (x . (x . NIL))) . NIL)))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote LAMBDA)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (equal (cddr list) (quote NIL)) ; NIL (Tなら引数１のエラー、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cdddr list) (quote NIL)) ; T (NILなら引数３以上のエラー、しかし任意のエラーの発生は出来ない)
+条件6 (atom (cadr list)) ; NIL (Tならラムダリストがリストでない、しかし任意のエラーの発生は出来ない))
+戻り値 list
+
+
+;cond
+(eval (quote (cond ((atom a) b) ((quote T) c))))
+
+引数list (cond ((atom a) b) ((quote T) c)) ; (cond . (((atom . (a . NIL)) . (b . NIL)) . ((quote . (T . NIL)) . ((c . NIL) . NIL))))
+条件1 (atom list) ; NIL
+条件2 (equal (car list) (quote COND)) ; T
+条件3 (equal (cdr list) (quote NIL)) ; NIL (Tなら引数０のエラー、しかし任意のエラーの発生は出来ない)
+条件4 (atom (cadr list)) ; NIL	(Tなら引数がシンボルになってる、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cdadr list) (quote NIL)) ; NIL (Tなら第一引数のリストの要素が１、しかし任意のエラーの発生は出来ない)
+条件5 (equal (cddadr list) (quote NIL)) ; T (NILなら第一引数のリストの要素が３以上、しかし任意のエラーの発生は出来ない)
+戻り値 条件式がTになったところの戻り値式
+必要な処理 条件式がTになるまで再帰的に条件式を評価する必要がある
+
+;lambda関数
+(eval (quote ((lambda (x y) (cons y x)) (quote (a b)) (quote c))))
+
+引数list ((lambda (x y) (cons y x)) (quote (a b)) (quote c)) ; 
+条件1 (atom list) ; NIL
+条件2 (atom (car list)) ; NIL
+条件3 (equal (caar list) (quote LAMBDA))
+条件4 (cadar list)と(cdr list)の数が一致 ; 仮引数と実引数の数が一致s

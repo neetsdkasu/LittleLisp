@@ -1,0 +1,81 @@
+純lisp論文よりeval
+
+eqはシンボル同士の評価しかできない、引数にリストが来るとエラー
+;list[e1;e2;e3;...en] は cons[e1;cons[e2;cons[e3;...cons[en]]]] に置き換えて考えろと記載されてる・・・
+
+(label caar (lambda (x) (car (car x))))
+(label caaar (lambda (x) (car (car (car x)))))
+(label caaaar (lambda (x) (car (car (car (car x))))))
+(label caaadr (lambda (x) (car (car (car (cdr x))))))
+(label caadr (lambda (x) (car (car (cdr x)))))
+(label caadar (lambda (x) (car (car (cdr (car x))))))
+(label caaddr (lambda (x) (car (car (cdr (cdr x))))))
+
+(label cadr (lambda (x) (car (cdr x))))
+(label cadar (lambda (x) (car (cdr (car x)))))
+(label cadaar (lambda (x) (car (cdr (car (car x))))))
+(label cadadr (lambda (x) (car (cdr (car (cdr x))))))
+(label caddr (lambda (x) (car (cdr (cdr x)))))
+(label caddar (lambda (x) (car (cdr (cdr (car x))))))
+(label cadddr (lambda (x) (car (cdr (cdr (cdr x))))))
+
+(label cdar (lambda (x) (cdr (car x))))
+(label cdaar (lambda (x) (cdr (car (car x)))))
+(label cdaaar (lambda (x) (cdr (car (car (car x))))))
+(label cdaadr (lambda (x) (cdr (car (car (cdr x))))))
+(label cdadr (lambda (x) (cdr (car (cdr x)))))
+(label cdadar (lambda (x) (cdr (car (cdr (car x))))))
+(label cdaddr (lambda (x) (cdr (car (cdr (cdr x))))))
+
+(label cddr (lambda (x) (cdr (cdr x))))
+(label cddar (lambda (x) (cdr (cdr (car x)))))
+(label cddaar (lambda (x) (cdr (cdr (car (car x))))))
+(label cddadr (lambda (x) (cdr (cdr (car (cdr x))))))
+(label cdddr (lambda (x) (cdr (cdr (cdr x)))))
+(label cdddar (lambda (x) (cdr (cdr (cdr (car x))))))
+(label cddddr (lambda (x) (cdr (cdr (cdr (cdr x))))))
+
+
+(label and (lambda (x y) (cond (x y) (T nil))))
+(label or (lambda (x y) (cond (x T) (T y))))
+(label not (lambda (x) (cond (x nil) (T T))))
+(label equal (lambda (x y) (cond ((and (atom x) (atom y)) (eq x y)) ((and (not (atom x)) (not (atom y))) (and (equal (car x) (car y)) (equal (cdr x) (cdr y)))) (T nil))))
+(label subst (lambda (x y z) (cond ((atom z) (cond ((eq z y) x) (T z))) (T (cons (subst x y (car z)) (subst x y (cdr z)))))))
+(label null (lambda (x) (cond ((atom x) (eq x nil)) (T nil))))
+(label append (lambda (x y) (cond ((null x) y) (T (cons (car x) (append (cdr x) y))))))
+(label among (lambda (x y) (cond ((not (null y)) (cond ((equal x (car y)) T) (T (among x (cdr y))))) (T nil))))
+(label pair (lambda (x y) (cond  ((and (null x) (null y)) nil) ((and (not (atom x)) (not (atom y))) (cons (cons (car x) (cons (car y) nil)) (pair (cdr x) (cdr y)))) (T nil))))
+(label assoc (lambda (x y) (cond ((eq (caar y) x) (cadar y)) (T (assoc x (cdr y))))))
+(label sub2 (lambda (x z) (cond ((null x) z) ((eq (caar x) z) (cadar x)) (T (sub2 (cdr x) z)))))
+(label sublis (lambda (x y) (cond ((atom y) (sub2 x y)) (T (cons (sublis x (car y)) (sublis x (cdr y)))))))
+(label apply (lambda (f args) (eval (cons f (appq args)) nil)))
+(label appq (lambda (m) (cond ((null m) nil) (T (cons (cons 'QUOTE (cons (car m) nil)) (qppq (cdr m)))))))
+(label evcon (lambda (c a) (cond ((eval (caar c) a) (eval (cadar c) a)) (T (evcon (cdr c a))))))
+(label evlis (lambda (m a) (cond ((null m) NIL) (T (cons (eval (car m) a) (evlis (cdr m) a))))))
+
+(label eval (lambda (e a) (cond   ((atom e) (assoc e a))  ((atom (car e)) (cond    ((eq (car e) 'QUOTE) (cadr e))   ((eq (car e) 'ATOM) (atom (eval (cadr e) a)))   ((eq (car e) 'EQ) (eq (eval (cadr e) a) (eval (caddr e) a)))   ((eq (car e) 'COND) (evcon (cdr e) a))   ((eq (car e) 'CAR) (car (eval (cadr e) a)))   ((eq (car e) 'CDR) (cdr (eval (cadr e) a)))   ((eq (car e) 'CONS) (cons (eval (cadr e) a) (eval (caddr e) a)))    (T (eval (cons (assoc (car e) a) (evlis (cdr e) a))))    ))   ((eq (caar e) 'LABEL) (eval (cons (caddar e) (cdr e)) (cons (cons (cadar e) (cons (car e) nil)) a)))   ((eq (caar e) 'LAMBDA) (eval (caddar e) (append (pair (cadar e) (evlis (cdr e) a)) a)))   )))
+   
+
+
+(apply '(label ff (lambda (x) (cond ((atom x) x) (t (ff (car x)))))) '(a . b))
+
+
+(label eval (lambda (e a)
+ (cond 
+  ((atom e) (assoc e a))
+  ((atom (car e)) (cond 
+   ((eq (car e) 'QUOTE) (cadr e))
+   ((eq (car e) 'ATOM) (atom (eval (cadr e) a)))
+   ((eq (car e) 'EQ) (eq (eval (cadr e) a) (eval (caddr e) a)))
+   ((eq (car e) 'COND) (evcon (cdr e) a))
+   ((eq (car e) 'CAR) (car (eval (cadr e) a)))
+   ((eq (car e) 'CDR) (cdr (eval (cadr e) a)))
+   ((eq (car e) 'CONS) (cons (eval (cadr e) a) (eval (caddr e) a)))
+   (T (eval (cons (assoc (car e) a) (evlis (cdr e) a))))
+   ))
+  ((eq (caar e) 'LABEL) (eval (cons (caddar e) (cdr e)) (cons (cons (cadar e) (cons (car e) nil)) a)))
+  ((eq (caar e) 'LAMBDA) (eval (caddar e) (append (pair (cadar e) (evlis (cdr e) a)) a)))
+  )))
+   
+
+

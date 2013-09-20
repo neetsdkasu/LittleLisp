@@ -1,0 +1,4 @@
+;Lisp Test
+
+(LABEL HOGE (LAMBDA () (QUOTE HOGE)))
+

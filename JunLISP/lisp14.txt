@@ -1,0 +1,741 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 純LISP オリジナル eval
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LastUpdate   2013/06/26
+;; Version      1.2.0
+;; Author       おれおれ (takeiteasy_idontthinkso)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 純LISPのページのテキストエリアにこのファイルの中身全部まるごとコピペで実行
+;; このファイルの最後にテスト用のEVALコードが書いてあります(注意：糞重い)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; このevalコードは下記URLで公開の私の純LISPの仕様を再現します
+;;  http://www.geocities.jp/takeiteasy_idontthinkso/mysoft/js_minimal_lisp/index.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; evalのために今回作ったLAMBDA関数一覧
+
+;; (EVAL func args)
+;; (EVAL-R func args)
+
+;; (PROGRAM codes varlist)
+
+;; (RESULT result:varlist)
+
+;; (IF test then else)
+;; (NOT value)
+;; (AND value1 value2)
+;; (OR value1 value2)
+;; (EXIST-S seek list)
+;; (TRUELIST list)
+;; (EQUAL value1 value2)
+;; (SYMBOLLIST list)
+;; (ISLIST list)
+
+;; (CAAR list)
+;; (CDAR list)
+;; (CADAR list)
+;; (CDDAR list)
+;; (CADDAR list)
+;; (CDDDAR list)
+
+;; (FINDVAR varlist name)
+;; (GETVAR varlist name)
+;; (ADDVAR varlist name value)
+
+;; (EXEC code varlist)
+;; (EXEC-ATOM code varlist)
+;; (EXEC-LIST result:varlist args)
+
+;; (DO-CAR args varlist)
+;; (DO-CDR args varlist)
+;; (DO-CONS args varlist)
+;; (DO-EQ args varlist)
+;; (DO-ATOM args varlist)
+;; (DO-COND args varlist)
+;; (DO-QUOTE args varlist)
+;; (DO-LABEL args varlist)
+;; (DEF-LAMBDA args varlist)
+;; (DO-LAMBDA-FUNC lambdalist body exec-args:varlist)
+
+;; (MAKE-ARG-LIST args varlist)
+;; (SET-LAMBDA-ARGS lambdalist exec-args varlist)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; eval      目的の関数 (実行実体の関数はexec)
+
+(label eval (lambda (E A)
+	(result (exec (cons E A) (quote NIL)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; eval-r   実行の成否と結果をペアにして返す
+;; 
+
+(label eval-r (lambda (E A)
+	((lambda (R)
+		(cond
+			((atom R) (cons (quote NIL) R))
+			((quote T) (cons (quote T) (car R)))
+		))
+	(exec (cons E A) (quote NIL)))
+	))
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; program   複数のLISPコードを実行する (変数を維持して複数のLISPコードを実行する)
+
+
+(label program (lambda (P V)
+	(cond 
+		((not (truelist V)) (quote ERROR))
+		((atom P) (reuslt (exec P V)))
+		((not (truelist P)) (quote ERROR))
+		((quote T)
+			((lambda (R N)
+				(cond
+					((atom R) R) ;; 実行エラー
+					((atom N) (cond (N (result (exec N (cdr R)))) ((quote T) (car R))))
+					((quote T) (program N (cdr R)))
+				)
+			) (exec (car P) V) (cdr P)))
+	)
+))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; result  execの戻り値から結果を取り出す
+
+(label result (lambda (R) (cond ((atom R) R) ((quote T) (car R)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; car cdr 合成関数
+
+(label cdar (lambda (X) (cdr (car X))))
+(label caar (lambda (X) (car (car X))))
+(label cadar (lambda (X) (car (cdr (car X)))))
+(label cddar (lambda (X) (cdr (cdr (car X)))))
+(label caddar (lambda (X) (car (cdr (cdr (car X))))))
+(label cdddar (lambda (X) (cdr (cdr (cdr (car X))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; if  第一引数がNIL以外なら第二引数、第一引数がNILなら第三引数を返す
+;;     第一引数がNILでも第二引数が評価されることに注意
+;;     第一引数がNIL以外でも第三引数が評価されることに注意
+
+(label if (lambda (X Y Z) (cond (X Y) ((quote T) Z))))
+
+;;例
+
+(if (quote A) (quote B) (quote C)) ;; B
+(if (quote NIL) (quote C) (quote D)) ;; D
+(if (quote K) (quote NIL) (quote T)) ;; NIL
+(if (quote NIL) (label A (quote B)) (quote R)) ;; R ※第二引数が実行されていることに注意 [Aの値はBになっている]
+(if (quote T) (quote P) (label C (quote D))) ;; P ※第三引数が実行されていることに注意 [Cの値はDになっている]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; not  引数がNILならT、NIL以外ならNILを返す
+
+(label not (lambda (X) (cond (X (quote NIL)) ((quote T) (quote T)))))
+
+;;例
+(not (quote T)) ;; NIL
+(not (quote NIL)) ;; T
+(not (cons (quote A) (quote B))) ;; NIL
+(not (cdr (quote (A)))) ;; T
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; and 第一引数がNIL以外なら第二引数、第一引数がNILならNILを返す
+;;     第一引数がNILでも第二引数が評価されることに注意
+
+(label and (lambda (X Y) (cond (X Y) ((quote T) (quote NIL)))))
+
+;;例
+
+(and (quote A) (quote B)) ;; B
+(and (quote NIL) (quote C)) ;; NIL
+(and (quote K) (quote NIL)) ;; NIL
+(and (quote NIL) (label A (quote B))) ;; NIL ※第二引数は実行されていることに注意 [Aの値はBになっている]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; or 第一引数がNILなら第二引数、第一引数がNIL以外ならTを返す
+;;     第一引数がNIL以外でも第二引数が評価されることに注意
+
+(label or (lambda (X Y) (cond (X (quote T)) ((quote T) Y))))
+
+;;例
+
+(or (quote A) (quote B)) ;; T
+(or (quote NIL) (quote C)) ;; C
+(or (quote NIL) (quote NIL)) ;; NIL
+(or (quote K) (label A (quote C))) ;; K ※第二引数は実行されていることに注意 [Aの値はCになっている]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exist-s  第二引数がリストならリスト内の要素に指定シンボルがあればT、なければNILを返す
+;;          第二引数がシンボルならEQと同じ
+;;          Sは調べるシンボル、Lはリストかシンボル
+;;          SにNIL、Lに純リストを指定した場合、純リストの末尾のNILが検出され必ずTとなることに注意
+;;          not の定義が必要
+
+(label exist-s (lambda (S L)
+	(cond 
+		((not (atom S)) (quote NIL)) ;; Sがリスト、
+		((atom L) (eq S L))
+		((atom (car L))
+			(cond
+				((eq (car L) S) (quote T))
+				((quote T) (exist-s S (cdr L)))))
+		((quote T) (exist-s S (cdr L))))))
+
+;;例
+(exist-s (quote D) (quote (A B C D E F G))) ;; T
+(exist-s (quote D) (quote (A B C (D) E F G))) ;; NIL
+(exist-s (quote X) (quote (A B C D E F G))) ;; NIL
+(exist-s (quote D) (quote (A B C K E F G . D))) ;; T
+(exist-s (quote D) (quote D)) ;; T
+(exist-s (quote NIL) (quote (A B C D E F G))) ;; T ※純リストの場合、末尾のNILが検索される
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; truelist 純リストならT、純リストじゃないならNILを返す
+
+(label truelist (lambda (L)
+	(cond ((atom L) (eq L (quote NIL))) ((quote T) (truelist (cdr L))))))
+	
+;;例
+(truelist (quote (A B C D E F G))) ;; T
+(truelist (quote ABC)) ;; NIL
+(truelist (quote (A . B))) ;; NIL
+(truelist (quote ((A B) (C D) (E F)))) ;; T
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; equal  ２つの引数が同じならT、違うならNILを返す。リスト同士の比較もできる
+;;        not と and の定義が必要
+
+(label equal (lambda (X Y)
+	(cond ((and (atom X) (atom Y)) (eq X Y))
+		((and (not (atom X)) (not (atom Y))) (and (equal (car X) (car Y)) (equal (cdr X) (cdr Y))))
+		((quote T) (quote NIL)))))
+
+;;例
+(equal (quote A) (quote A)) ;; T
+(equal (quote A) (quote B)) ;; NIL
+(equal (quote (A)) (quote A)) ;; NIL
+(equal (quote (A B)) (quote (A B))) ;; T
+(equal (quote (A . B)) (quote (A . B))) ;; T
+(equal (quote (A B)) (quote (A . B))) ;; NIL
+(equal (quote (C D)) (quote (A B))) ;; NIL
+(equal (quote (A B C)) (quote (A B))) ;; NIL
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; symbollist  リストの要素がアトムだけならT、もしくはアトムや空リストもT、それ以外はNIL
+
+(label symbollist (lambda (X) 
+	(cond 
+		((atom X) (quote T))
+		((atom (car X)) (symbollist (cdr X)))
+		((quote T) (quote NIL))
+	)))
+
+;;例
+(symbollist (quote (A B C D E F))) ;; T
+(symbollist (quote (A . B))) ;; T
+(symbollist (quote NIL)) ;; T
+(symbollist (quote A)) ;; T
+(symbollist (quote (A (B) C D E))) ;; NIL
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; islist      引数がリストか空リストだったらT、NIL以外のアトムならNIL
+
+(label islist (lambda (X)
+	(cond 
+		((atom X) (eq X (quote NIL)))
+		((quote T) (quote T)))))
+
+
+(islist (quote A)) ;; NIL
+(islist (quote NIL)) ;; T
+(islist (quote (A B))) ;; T
+(islist (quote (A . B))) ;; T
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; findvar   変数リストに指定名の変数があればT、無ければNILを返す
+;;           not if cdar の定義が必要
+
+(label findvar (lambda (V S)
+	(cond
+		((not (atom s)) (quote ERROR))
+		((atom V) (if (eq V (quote NIL)) (quote NIL) (quote ERROR))) ;; Vが空リストならNIL、VがただのアトムならERROR
+		((quote T)
+			(cond
+				((atom (car V)) (quote ERROR)) ;; 変数の対になっていないのでERRORとして検索を中断する
+				((quote T)
+					(cond
+						((atom (cdar V))
+							(cond
+								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; 二重括弧
+								((eq (cdar V) S) (quote T)) ;; 変数が見つかった
+								((quote T) (findvar (cdr V) S))))
+						((quote T) (quote ERROR)) ;; 変数名の部分がリストになってるのでERRORとして検索を中断する
+					)))))))
+
+;;例
+(findvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote B)) ;; T 
+(findvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote A)) ;; NIL
+(findvar (quote ((a . b) a (a . e) (e . f))) (quote A)) ;; ERROR
+(findvar (quote ((a . b) (c . (a)) (a . e) (e . f))) (quote A)) ;; ERROR
+(findvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ※予約キーワードでの検索は禁止していない
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; getvar   変数リストに指定名の変数があれば対応する値、無ければERRORを返す
+;;           not or if cdar caar の定義が必要
+
+(label getvar (lambda (V S)
+	(cond
+		((or (not (atom S)) (atom V)) (quote ERROR)) ;; Vがアトムや空リスト、Sがシンボルでない、ならエラー
+		((quote T)
+			(cond
+				((atom (car V)) (quote ERROR)) ;; 変数の対になっていないのでERRORとして検索を中断する
+				((quote T)
+					(cond
+						((atom (cdar V))
+							(cond
+								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; 二重括弧
+								((eq (cdar V) S) (caar V)) ;; 変数が見つかった
+								((quote T) (getvar (cdr V) S))))
+						((quote T) (quote ERROR)) ;; 変数名の部分がリストになってるのでERRORとして検索を中断する
+					)))))))
+
+;;例
+(getvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote B)) ;; A
+(getvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote A)) ;; ERROR
+(getvar (quote ((a . b) a (a . e) (e . f))) (quote A)) ;; ERROR
+(getvar (quote ((a . b) (c . (a)) (a . e) (e . f))) (quote A)) ;; ERROR
+(getvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ※予約キーワードでの検索は禁止していない
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; addvar   変数リストへの変数の追加
+;;			or not truelist exist-s の定義が必要
+
+(label addvar (lambda (V S D)
+	(cond 
+		((or (not (truelist V)) (not (atom S))) (quote ERROR)) ;; Vが純リストでない、Sがシンボルでない場合はエラー
+		((exist-s S (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (quote ERROR)) ;; 変数名に予約キーワードを使用しようとするとエラー
+		((quote T) (cons (cons D S) V)) ;; 値を追加した変数リストを返す
+	)))
+
+;;例
+
+(addvar (quote NIL) (quote A) (quote HOGE)) ;; ((HOGE . A))
+(addvar (quote ((HOGE . A))) (quote B) (quote UNKO)) ;; ((UNKO . B) (HOGE . A))
+(addvar (quote ((HOGE . A))) (quote A) (quote FOO)) ;; ((FOO . A) (HOGE . A))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exec      評価すべき式（値）を評価する
+;;           Cには評価すべき式（値）、Vには変数リスト
+;;           exec-atom exec-list の定義が必要
+
+(label exec (lambda (C V)
+	(cond
+		((not (islist V)) (quote ERROR))
+		((atom C) (exec-atom C V))
+		((quote T) (exec-list (exec (car C) V) (cdr C)))
+	)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exec-atom  評価すべきアトム(値)を評価する
+;;            not findvar getvar exist-s islist の定義が必要
+
+
+(label exec-atom (lambda (C V)
+	(cond 
+		((not (islist V)) (quote ERROR))
+		((not (atom C)) (quote ERROR))	;; イレギュラーな呼び出し
+		((quote T)
+			(cond
+				((exist-s C (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (cons C V)) ;;予約キーワード
+				((eq (findvar V C) (quote T)) (cons (getvar V C) V)) ;; 変数
+				((quote T) (quote ERROR)) ;; 存在しない値
+			)))))
+			
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exec-list   評価すべきリストを処理する
+;;             caar cdar cadarcddar caddar cdddar truelist の定義が必要
+;;             do-quote def-lambda の定義が必要
+
+(label exec-list (lambda (E A)
+	(cond
+		((not (truelist A)) (quote ERROR))
+		((atom E) (quote ERROR)) ;;イレギュラーな呼び出し
+		((atom (car E))
+			(cond 
+				((eq (car E) (quote EQ)) (do-eq A (cdr E)))
+				((eq (car E) (quote CONS)) (do-cons A (cdr E)))
+				((eq (car E) (quote CAR)) (do-car A (cdr E)))
+				((eq (car E) (quote CDR)) (do-cdr A (cdr E)))
+				((eq (car E) (quote ATOM)) (do-atom A (cdr E)))
+				((eq (car E) (quote COND)) (do-cond A (cdr E)))
+				((eq (car E) (quote QUOTE)) (do-quote A (cdr E)))
+				((eq (car E) (quote LABEL)) (do-label A (cdr E)))
+				((eq (car E) (quote LAMBDA)) (def-lambda A (cdr E)))
+				((quote T) (quote ERROR)))) ;; システム関数でないものを呼び出し
+		((atom (caar E))
+			(cond
+				((eq (caar E) (quote LAMBDA))
+					(cond
+						((atom (cdar E)) (quote ERROR)) ;;要素一つ(LAMBDA)のみのリスト
+						((atom (cddar E)) (quote ERROR)) ;; 要素二つのみのリスト(ラムダリストかボディが抜けてる)
+						((cdddar E) (quote ERROR)) ;; 要素が４つ以上のリスト
+						((quote T) (do-lambda-func (cadar E) (caddar E) (make-arg-list A (cdr E))))
+					))
+				((quote T) (quote ERROR)))) ;;LAMBDA関数でもない謎リストの呼び出し
+		((quote T) (quote ERROR)) ;;謎リストの呼び出し
+	)))
+			
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-quote
+;;           QUOTE 特殊形式
+
+(label do-quote (lambda (A V)
+	(cond
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数リストの要素が２つ以上 (最後の要素であるはずなのにがNILになってない)
+		((quote T) (cons (car A) V)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; def-lambda
+;;           LAMBDA 特殊形式 (LAMBDA関数の定義)
+;;           not islist symollist の定義が必要
+
+(label def-lambda (lambda (A V)
+	(cond
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((not (symbollist (car A))) (quote ERROR)) ;; ラムダリストがシンボルのみのリストでない
+		((quote T) (cons (cons (quote LAMBDA) A) V)) ;; ラムダの定義式をそのまま返す
+	)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-atom
+;;          ATOM システム関数
+;;          exec の定義が必要
+
+(label do-atom (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
+		((quote T)
+			((lambda (R) 
+				(cond
+					((atom R) R)
+					((quote T) (cons (ATOM (car R)) (cdr R)))
+				))
+			(exec (car A) V)))
+		)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-car
+;;         CAR システム関数
+;;         exec islist の定義が必要
+
+(label do-car (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
+		((quote T)
+			((lambda (R) 
+				(cond
+					((atom R) R)
+					((islist (car R)) (cons (CAR (car R)) (cdr R)))
+					((quote T) (quote ERROR))
+				))
+			(exec (car A) V)))
+		)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-cdr
+;;         CDR システム関数
+;;         exec islist の定義が必要
+
+(label do-cdr (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
+		((quote T)
+			((lambda (R) 
+				(cond
+					((atom R) R)
+					((islist (car R)) (cons (CDR (car R)) (cdr R)))
+					((quote T) (quote ERROR))
+				))
+			(exec (car A) V)))
+		)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-cons
+;;          CONS システム関数
+;;          cddr cadr の定義が必要
+;;          exec の定義が必要
+
+(label do-cons (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((quote T)
+			((lambda (ER1 R2)
+				(cond 
+					((atom  ER1) ER1) ;; 第一引数がエラー
+					((quote T)
+						((lambda (R1 ER2)
+							(cond
+								((atom ER2) ER2) ;; 第二引数がエラー
+								((quote T)
+									(cons (CONS R1 (car ER2)) (cdr ER2)))
+							))
+						(car ER1) (exec R2 (cdr ER1))))
+				))
+			(exec (car A) V) (cadr A)))
+	)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-eq
+;;          EQ システム関数
+;;          cddr cadr の定義が必要
+;;          exec の定義が必要
+
+(label do-eq (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((quote T)
+			((lambda (ER1 R2)
+				(cond 
+					((atom  ER1) ER1) ;; 第一引数がエラー
+					((quote T)
+						((lambda (R1 ER2)
+							(cond
+								((atom ER2) ER2) ;; 第二引数がエラー
+								((quote T)
+									(cond
+										((and (atom R1) (atom (car ER2)))
+											(cons (EQ R1 (car ER2)) (cdr ER2)))
+										((quote T) (quote ERROR))
+									))
+							))
+						(car ER1) (exec R2 (cdr ER1))))
+				))
+			(exec (car A) V) (cadr A)))
+	)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-label
+;;          LABEL 特殊形式
+;;          cddr cadr islist addvar の定義が必要
+;;          exec の定義が必要
+
+(label do-label (lambda (A V)
+	(cond 
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((islist (car A)) (quote ERROR)) ;; 第一引数がシンボルになってない
+		((quote T)
+			((lambda (S D)
+				(cond 
+					((atom D) D) ;;第二引数がエラー
+					((quote T)
+						((lambda (R L)
+							(cond 
+								((atom L) L) ;; 引数追加エラー
+								((quote T) (cons R L))))
+						(car D) (addvar (cdr D) S (car D)))
+					)
+				))
+			(car A) (exec (cadr A) V))
+			)
+	)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-cond
+;;          COND 特殊形式
+;;          caar cdar cddar cadar の定義が必要
+;;          exec の定義が必要
+
+(label do-cond (lambda (A V)
+	(cond
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (car A)) (quote ERROR)) ;; 第一引数がアトム、もしくは空リスト
+		((atom (cdar A)) (quote ERROR)) ;;第一引数の要素が１つしかない
+		((cddar A) (quote ERROR)) ;; 第一引数の要素が３つ以上
+		((quote T)
+			((lambda (H P N)
+				(cond
+					((atom H) H) ;; 第一引数の評価がエラー
+					((car H) (exec P (cdr H))) ;; 第一引数の評価が成功なら対の値を返す
+					((quote T) (do-cond N (cdr H))) ;; 第二引数へ処理をうつす
+				))
+			(exec (caar A) V) (cadar A) (cdr A)))
+	)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; make-arg-list   LAMBDA関数呼び出しの引数リストを作る
+;;                 戻り値は評価後引数リストと変数リストのペア
+;;                 islist exec の定義が必要
+
+(label make-arg-list (lambda (A V) 
+	(cond
+		((not (islist A)) (quote ERROR)) ;; リストの末尾がNIL以外のアトム
+		((atom A) (cons A V)) ;; リストの末尾 NILのはず
+		((quote T)
+			((lambda (D R)
+				(cond
+					((atom D) D) ;; Dはエラー
+					((quote T)
+						((lambda (P Q)
+							(cond 
+								((atom Q) Q) ;; 再帰でエラー
+								((quote T) (cons (cons P (car Q)) (cdr Q)))
+							))
+						(car D) (make-arg-list R (cdr D))))
+				))
+			(exec (car A) V) (cdr A)))
+	)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; set-lambda-args    LAMBDA関数の仮引数と実引数を結び付ける
+;;                    equal islist not addvar if の定義が必要
+
+(label set-lambda-args (lambda (D A V)
+	(cond 
+		((equal D (quote NIL)) (if (equal A (quote NIL)) V (quote ERROR))) ;;ラムダリストの末尾
+		((atom D) (addvar V D A)) ;;Aの残り全部を登録
+		((atom (car D))
+			(cond
+				((atom A) (quote ERROR))
+				((quote T) 
+					((lambda (DD AA R)
+						(cond
+							((not (islist R)) (quote ERROR)) ;;変数設定エラー(おそらく予約キーワード)
+							((quote T) (set-lambda-args DD AA R))
+						))
+					(cdr D) (cdr A) (addvar V (car D) (car A))))
+			))
+		((quote T) (quote ERROR)) ;; ラムダリストがシンボルじゃない
+	)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; do-lambda-func LAMBDA関数の実行を担う
+
+
+(label do-lambda-func (lambda (D B AV)
+	(cond
+		((atom AV) AV) ;; 引数リストの生成失敗？
+		((not (truelist (car AV))) (quote ERROR)) ;; 評価後引数リストが純リストになってない
+		((not (truelist (cdr AV))) (quote ERROR)) ;; 変数リストが純リストになってない
+		((not (symbollist D)) (quote ERROR)) ;; ラムダリストがシンボルリストになってない
+		((quote T)
+			((lambda (P A V)
+				(cond
+					((atom A) A) ;;引数紐つけエラー
+					((quote T)
+						((lambda (R O)
+							(cond
+								((atom R) R) ;; 関数実行エラー
+								((quote T) (cons (car R) O)) ;; 前の変数リストで戻り値を返す
+							))
+						(exec P A) V))
+				))
+			B (set-lambda-args D (car AV) (cdr AV)) (cdr AV)))
+	)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;テストコード１
+
+;;複数のLISPコードを実行する
+
+(program (quote (
+
+(label a (quote ABC))
+(label b (quote (EFG HIJ)))
+(label b (cons a b))
+(cons a b) ;; 最後のLISPコードの結果が表示される 結果は(ABC ABC EFG HIJ)となる
+
+)) (quote NIL))
+
+;;
+;;  eval上でeval？
+;;
+;;  lisp15.txtの内容をテキストエリアにコピペして実行したあとで
+;;  以下のようなコードを入力して実行することで eval上にevalを実現できます(チューリング完全なので可能なのです！)
+;;  (全処理に100倍以上の時間がかかるので注意、処理が倍以上に重いlisp14.txtではテストしないほうが無難です)
+;;  
+;;  (program (quote (
+;;  
+;;    ;;この位置にlisp15.txtの内容を丸々コピペ
+;;  
+;;  )) (quote NIL))
+;;
+;;  ◆参考 (lisp15.txtでテスト)
+;;  私のネットブック(CPU1.66GHz, メモリ1GB, Windows7 Starter SP1)でブラウザOpera(12.15)上で実行した結果
+;;    lisp15.txtの内容をテキストエリアにコピペして実行 … 数秒程度
+;;    上記実行後 program関数にlisp15.txtの内容を渡して実行 … 5～6分
+;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;テストコード２
+
+;; (SUBST replace symbol value)  value内のsymbolをreplaceに置き換える
+;; このevalは
+;; (label SUBST (lambda (x y z) (cond ((atom z) (cond ((eq y z) x) ((quote t) z))) ((quote t) (cons (subst x y (car z)) (subst x y (cdr z)))))))
+;; (SUBST (quote (X Y)) (quote B) (quote (A (B C) A B C))) を実行する
+;; 結果は (A ((X Y) C) A (X Y) C) となる
+
+(EVAL (quote (LABEL SUBST (LAMBDA (X Y Z) (COND ((ATOM Z) (COND ((EQ Y Z) X) ((quote T) Z))) 
+ ((quote T) (CONS (SUBST X Y (CAR Z)) (SUBST X Y (CDR Z)))))))) 
+ (quote ((quote (X Y)) (quote B) (quote (A (B C) A B C)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; このテキストファイルの終わり
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

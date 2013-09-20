@@ -1,0 +1,164 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 純LISP オリジナル eval やや軽 (lisp14.txtの軽量化)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LastUpdate   2013/06/26
+;; Version      2.2.0
+;; Author       おれおれ (takeiteasy_idontthinkso)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 純LISPのページのテキストエリアにこのファイルの中身全部まるごとコピペで実行
+;; このファイルの最後にテスト用のEVALコードが書いてあります(注意：糞重い)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 軽量化のため思い切ってエラートラップを削ってあります
+;; 引数や名前などを間違ったLISPコードをeval等の関数の入力に与えるとどうなるか不明です
+;; また不要コード等を整理し簡略化したため関数の処理に違いがあります
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; このevalコードは下記URLで公開の私の純LISPの仕様を再現します
+;;  http://www.geocities.jp/takeiteasy_idontthinkso/mysoft/js_minimal_lisp/index.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; eval      目的の関数 (実行実体の関数はexec)
+
+(label eval (lambda (E A) (car (exec (cons E A) (quote NIL)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; program   複数のLISPコードを実行する (変数を維持して複数のLISPコードを実行する)
+
+(label program (lambda (P V) (cond ((atom P) (car (exec P V))) ((quote T) (program-in (exec (car P) V) (cdr P))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;無名関数だったものや再帰呼び出し関数を整理
+
+(label getvar (lambda (V S) (cond ((eq (cdr (car V)) S) (car (car V))) ((quote T) (getvar (cdr V) S)))))
+(label do-atom (lambda (R) (cons (ATOM (car R)) (cdr R))))
+(label do-label (lambda (S D) (cons (car D) (cons (cons (car D) S) (cdr D)))))
+(label do-cdr (lambda (R) (cons (CDR (car R)) (cdr R))))
+(label do-car (lambda (R) (cons (CAR (car R)) (cdr R))))
+(label do-cons-in (lambda (R1 ER2) (cons (CONS R1 (car ER2)) (cdr ER2))))
+(label do-cons (lambda (ER1 R2) (do-cons-in (car ER1) (exec R2 (cdr ER1)))))
+(label do-eq-in (lambda (R1 ER2) (cons (EQ R1 (car ER2)) (cdr ER2))))
+(label do-eq (lambda (ER1 R2) (do-eq-in (car ER1) (exec R2 (cdr ER1)))))
+(label do-cond-in (lambda (H P N) (cond ((car H) (exec P (cdr H))) ((quote T) (do-cond N (cdr H)))))) 
+(label do-cond (lambda (A V) (do-cond-in (exec (car (car A)) V) (car (cdr (car A))) (cdr A))))
+(label make-arg-list-in2 (lambda (P Q) (cons (cons P (car Q)) (cdr Q))))
+(label make-arg-list-in1 (lambda (D R) (make-arg-list-in2 (car D) (make-arg-list R (cdr D)))))
+(label make-arg-list (lambda (A V) (cond ((atom A) (cons A V)) ((quote T) (make-arg-list-in1 (exec (car A) V) (cdr A))))))
+(label do-lambda-func (lambda (D B AV) (cons (car (exec B (set-lambda-args D (car AV) (cdr AV)))) (cdr AV))))
+(label program-in (lambda (R N) (cond ((atom N) (cond (N (car (exec N (cdr R)))) ((quote T) (car R)))) ((quote T) (program N (cdr R))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exec      評価すべき式（値）を評価する
+
+(label exec (lambda (C V)
+	(cond
+		((atom C)
+			(cond
+				((eq C (quote ATOM)) (cons C V))
+				((eq C (quote EQ)) (cons C V))
+				((eq C (quote CONS)) (cons C V))
+				((eq C (quote CAR)) (cons C V))
+				((eq C (quote CDR)) (cons C V))
+				((eq C (quote COND)) (cons C V))
+				((eq C (quote QUOTE)) (cons C V))
+				((eq C (quote LABEL)) (cons C V))
+				((eq C (quote LAMBDA)) (cons C V))
+				((eq C (quote NIL)) (cons C V))
+				((eq C (quote T)) (cons C V))
+				((quote T) (cons (getvar V C) V)) ;; 変数
+			)
+		)
+		((quote T) 
+			(exec-list (exec (car C) V) (cdr C))
+		)
+	)
+))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; exec-list 評価すべきリストを処理する
+
+(label exec-list (lambda (E A)
+	(cond
+		((atom (car E))
+			(cond 
+				((eq (car E) (quote QUOTE)) (cons (car A) (cdr E)))
+				((eq (car E) (quote ATOM)) (do-atom (exec (car A) (cdr E))))
+				((eq (car E) (quote EQ)) (do-eq (exec (car A) (cdr E)) (car (cdr A))))
+				((eq (car E) (quote CONS)) (do-cons (exec (car A) (cdr E)) (car (cdr A))))
+				((eq (car E) (quote CAR)) (do-car (exec (car A) (cdr E))))
+				((eq (car E) (quote CDR)) (do-cdr (exec (car A) (cdr E))))
+				((eq (car E) (quote COND)) (do-cond A (cdr E)))
+				((eq (car E) (quote LABEL)) (do-label (car A) (exec (car (cdr A)) (cdr E))))
+				((eq (car E) (quote LAMBDA)) (cons (cons (quote LAMBDA) A) (cdr E)))
+			))
+		((quote T)
+			(do-lambda-func (car (cdr (car E))) (car (cdr (cdr (car E)))) (make-arg-list A (cdr E)))
+			)
+	)
+))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; set-lambda-args LAMBDA関数の仮引数と実引数を結び付ける
+
+(label set-lambda-args (lambda (D A V)
+	(cond 
+		((cond ((atom D) (eq D (quote NIL))) ((quote T) (quote NIL))) V) 
+		((atom D) (cons (cons A D) V)) 
+		((quote T) (set-lambda-args (cdr D) (cdr A) (cons (cons (car A) (car D)) V)))
+	)
+))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;テストコード１
+
+;;複数のLISPコードを実行する
+
+(program (quote (
+
+(label a (quote ABC))
+(label b (quote (EFG HIJ)))
+(label b (cons a b))
+(cons a b) ;; 最後のLISPコードの結果が表示される 結果は(ABC ABC EFG HIJ)となる
+
+)) (quote NIL))
+
+;;
+;;  eval上でeval？
+;;
+;;  lisp15.txtの内容をテキストエリアにコピペして実行したあとで
+;;  以下のようなコードを入力して実行することで eval上にevalを実現できます(チューリング完全なので可能なのです！)
+;;  (全処理に100倍以上の時間がかかるので注意、処理が倍以上に重いlisp14.txtではテストしないほうが無難です)
+;;  
+;;  (program (quote (
+;;  
+;;  ;;この位置にlisp15.txtの内容を丸々コピペ
+;;  
+;;  )) (quote NIL))
+;;
+;;  ◆参考 (lisp15.txtでテスト)
+;;  私のネットブック(CPU1.66GHz, メモリ1GB, Windows7 Starter SP1)でブラウザOpera(12.15)上で実行した結果
+;;    lisp15.txtの内容をテキストエリアにコピペして実行 … 数秒程度
+;;    上記実行後 program関数にlisp15.txtの内容を渡して実行 … 5～6分
+;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;テストコード２
+
+;; (SUBST replace symbol value)  value内のsymbolをreplaceに置き換える
+;; このevalは
+;; (label SUBST (lambda (x y z) (cond ((atom z) (cond ((eq y z) x) ((quote t) z))) ((quote t) (cons (subst x y (car z)) (subst x y (cdr z)))))))
+;; (SUBST (quote (X Y)) (quote B) (quote (A (B C) A B C))) を実行する
+;; 結果は (A ((X Y) C) A (X Y) C) となる
+
+(EVAL (quote (LABEL SUBST (LAMBDA (X Y Z) (COND ((ATOM Z) (COND ((EQ Y Z) X) ((quote T) Z))) 
+ ((quote T) (CONS (SUBST X Y (CAR Z)) (SUBST X Y (CDR Z)))))))) 
+ (quote ((quote (X Y)) (quote B) (quote (A (B C) A B C)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; このテキストファイルの終わり
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

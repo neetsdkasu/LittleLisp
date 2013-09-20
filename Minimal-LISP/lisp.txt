@@ -1,0 +1,400 @@
+Lisp 
+
+Lispは大文字小文字を区別しない
+
+定数(記号型) t nil otherwise
+特別式 setq quote if progn tagbody go block return-from
+マクロ and or when unless cond case return loop defun
+関数 + - * / = /= < > >= <= set list car cdr cons not length eval
+	char-code code-char symbol-value 
+
+●+関数
+	+ &rest numbers
+	例 (+ 1 2 3 4 5) > 45, (+) > 0
+
+●-関数
+	- number &rest more-numbers
+	例 (- 10 1 2) > 7
+
+●*関数
+	* &rest numbers
+	例 (* 1 2 3 4) > 24, (*) > 1
+
+●/関数
+	/ number &rest more-numbers
+	例 (/ 100 2 5) > 10
+
+▲基数表現
+	#基数r整数 または #基数R整数
+	例 #2r1010 > 10, #3r12 > 5, #8r10 > 8,  #16r1A > 26
+
+	２進数 #b または #B    例 #b1010 > 10
+	８進数 #o または #O    例 #o10 > 8
+	１６進数 #x または #X  例 #x1A > 26
+
+▲分数表現（デフォルトらしい）
+	例 (+ 1/2 1/3) > 5/6, (* 1/3 -2) > -2/3,  #b10/11 > 2/3
+
+▲小数表現
+	例 (+ 0.1 1.3) > 1.4, (+ .5 1.) > 1.5
+
+▲指数表現
+	例 1.0e2 > 100, 2E-3 > 0.002
+
+▲複素数表現
+	例 (* #C(4 3) #C(4 -3)) > 25, (* #C(1.34 3) #C(1/2 -3)) > #C(9.67 -2.52)
+
+▲１文字表現
+	例 #\A > #\A 
+
+	特殊文字
+	#\Space 空白スペース 
+	#\Tab タブ 
+	#\Rubout 消去 
+	#\Return 復帰 
+	#\LineFeed 改行 
+	#\Page 改ページ 
+
+▲リスト
+	(1 2 3 4 5)や(+ 1 2 3)や(car x)などありとあらゆる式がリストという定義されてる
+	空のリスト()はNILと同値になる
+
+▼システム定数（識別子として使えない）
+	NIL     比較関数で偽の時に返される値、空のリスト()はNILと同値になる
+	T       比較関数で真の時に返される値
+
+●char-code関数
+	char-code char
+	例 (char-code #\A) > 65
+
+●code-char関数
+	code-char code &optional (bits 0) (font 0)
+	例 (code-char 65) > #\A
+
+◆setq特別式
+	setq {var form}*
+	varの部分が変数の識別子として認識される
+	識別子は数値やシステム定数として認識されない文字なら何でも使える（ 1+ $$ *1* などでも変数名に使える）
+	識別子は大文字小文字を区別しない
+	戻り値はたぶん最後の変数代入値かな？わからん
+	例 (setq x 10) > 10 ... 変数xに10を代入, (setq a 10 b 2 c 3) ... a=10 b=2 c=3 の変数代入
+
+◆quote特別式
+	quote 識別子
+	識別子を記号型の値として返す
+	例　(quote x) > X ... 変数xへの参照みたいなもの
+	省略式 '識別子
+	例 (quote x) なら 'x と書ける
+	
+	quote object
+	quote は引数に渡されたデータを評価せずに値として返す
+	例 (quote (1 2 3)) > (1 2 3)
+	例 '(10 20 30) > (10 20 30)
+	例 (quote ()) > NIL
+	例 (quote (+ 1 2)) > (+ 1 2)
+	
+	quoteは引数に受け取ったものをそのまま返すのが特徴（？）
+
+●set関数
+	set symbol value
+	記号型の値が示す変数に値を代入する
+	例 (set (quote x) 10) は (setq x 10) と同様に 変数xに10を代入する
+	　 (setq a 10) (set (quote x) 'a) (set x 100) ... x > A , a > 100 となる
+
+●symbol-value関数
+	symbol-value 記号型
+	記号型が示す変数の値を返す
+	例 (setq a 10) (setq x 'a) ... (symbol-value x) > 10
+
+●list関数
+	list &rest args
+	データのリストを作る
+	例 (list 1 2 3 4) > (1 2 3 4)
+	例 (list (list 1 2 3) (list 5 6) 7 8) > ((1 2 3) (5 6) 7 8)
+	例 (list) > NIL
+
+
+●car関数
+	car list
+	リストの先頭要素を返す
+	例 (car '(10 20 30)) > 10
+
+●cdr関数
+	cdr list
+	リストの先頭要素以外を返す
+	例 (cdr '(10 20 30)) > (20 30)
+	例 (cdr '(10 30)) > (30)
+	例 (cdr '(20)) > NIL
+
+●cons関数
+	cons addValue list
+	リストの先頭に値を追加する
+	例 	(setq x '(30)) > (30)
+		(setq x (cons 20 x)) > (20 30)
+		(setq x (cons 10 x)) > (10 20 30)
+
+●length関数
+	length sequence
+	リストの長さを返す
+	例 (length '(10 20)) > 2
+	例 (length (cdr '(10))) > 0
+	例 (length nil) > 0
+
+●eval関数
+	eval form
+	組み込み関数 引数であたえられたリストを評価する
+	例 (setq x '(+ 1 2)) (eval x) > 3
+	例 (eval '(setq x '(1 3 5))) > (1 3 5)
+	例 (setq add '(+ x y)) (setq x 10 y 20) (eval add) > 30
+
+●=関数
+	= number &rest more-numbers
+	引数の全ての値が等しいとき T どれ違ってるとき NIL
+	例 (= 1 1) > T
+	例 (= 1 2) > NIL
+	例 (= 1 1 2) > NIL
+	例 (= 3 3 3 3) > T
+
+●/=関数
+	/= number &rest more-numbers
+	引数の全ての値が異なるときに T 同値の組み合わせが一つでもあれば NIL
+	例 (/= 1 1) > NIL
+	例 (/= 1 2) > T
+	例 (/= 2 1 1) > NIL
+	例 (/= 1 2 3 4) > T
+
+●<関数
+	< number &rest more-numbers
+	どの引数においてもその引数より右にある（後に来る）引数より小さい場合 T それ以外は NIL
+	例 (< 1 2) > T
+	例 (< 2 1) > NIL
+	例 (< 1 2 4 6) > T
+	例 (< 1 4 4 6) > NIL
+	例 (< 1 4 6 2) > NIL
+
+●>関数
+	> number &rest more-numbers
+	どの引数においてもその引数より右にある（後に来る）引数より大きい場合 T それ以外は NIL
+	例 (> 1 2) > NIL
+	例 (> 2 1) > T
+	例 (> 6 4 2 1) > T
+	例 (> 6 2 2 1) > NIL
+	例 (> 6 2 4 1) > NIL
+
+●<=関数
+	<= number &rest more-numbers
+	どの引数においてもその引数より右にある（後に来る）引数より小さいか同値の場合 T それ以外は NIL
+	例 (<= 1 2) > T
+	例 (<= 3 3) > T
+	例 (<= 2 1) > NIL
+	例 (<= 1 4 4 6) > T
+	例 (<= 1 4 6 4) > NIL
+
+●>=関数
+	>= number &rest more-numbers
+	どの引数においてもその引数より右にある（後に来る）引数より大きいか同値の場合 T それ以外は NIL
+	例 (>= 1 2) > NIL
+	例 (>= 2 1) > T
+	例 (>= 5 5) > T
+	例 (>= 6 4 2 2) > T
+	例 (>= 6 2 4 2) > NIL
+
+●not関数
+	not x
+	引数にNILが渡された場合 T 、それ以外は NIL を返す
+	例 (not nil) > T
+	例 (not t) > NIL
+	例 (not 10) > NIL
+
+★andマクロ
+	and {form}*
+	指定された引数に一つでもNILがあればNILを返し、NILが一つも無ければ最後の引数を返す
+	引数を順に見てNILが見つかった時点で処理を抜けるのでそれ以降の引数が評価されない
+	(and form1 form2 form3) なら (if form1 (if form2 form3)) と同じかな
+	(and form1) なら form1 と同じかな
+	例 (and 1 t 3 4) > 4
+	例 (and 1 nil 3 4) > NIL
+	例 (and 5 7 nil t 4 nil) > NIL
+
+★orマクロ
+	or {form}*
+	指定された引数を順に見てNIL以外があれば最初に出てきたそのNIL以外の値を返す、最後までNILならNILを返す
+	引数を順に見てNIL以外が見つかった時点で処理を抜けるのでそれ以降の引数が評価されない
+	(or form1 form2 form3)は(if (setq x form1) x (if (setq x form2) x form3)) な感じ？分からん
+	例 (or nil nil 2 5 t) > 2
+	例 (or 5 nil t nil 2) > 5
+	例 (or nil nil nil) > NIL
+
+◆if特別式
+	if test then [else]
+	testが評価されNIL以外なら thenが評価され(elseは評価されない) NILならelseが評価される(thenは評価されない)
+	elseを省略した場合、testがNILならNILを返す
+	例 (if t 10 100) > 10
+	例 (if 1 10 100) > 10
+	例 (if nil 10 100) > 100
+	例 (if nil 10) > NIL
+
+◆progn特別式
+	progn {form}*
+	複数の引数を評価し、最後の引数の値を返す、引数がひとつも無いときはNILを返す
+	例 (progn (setq x 100) (setq x (+ x 100)) (+ x + 2)) > 202
+	例 (progn (setq a 10) (setq b 20) (* a b)) > 200
+	例 (progn 10 20 30 40) > 40
+	例 (progn) > NIL
+
+★whenマクロ
+	when test {form}*
+	(if test (progn form...)) と等価な処理をする
+	最初の引数testを評価しNIL以外なら残りの引数を評価し最後の引数を返す、testがNILならNILを返す
+
+★unlessマクロ
+	unless test {form}*
+	(when (not test) form ...) と等価な処理をする
+	最初の引数testを評価しNILなら残りの引数を評価し最後の引数を返す、testがNIL以外ならNILを返す
+	
+★condマクロ
+	cond { ( test { form } * ) } *
+	(if test (progn ..) (if test2 (progn ..)) (if test3 (progn ..) ...) のような式を実現するマクロ
+	上記の例は(cond (test ..) (test2 ..) (test3 ..) ...) となる
+
+★caseマクロ
+	case keyform {({({ key }*) | key } { form }*)}*
+	(if (= keyform key1 key2 ..) (progn ...) (if (= keyform key3) (progn ...) (if (=keyform key4 key5 ..) (progn ...))))
+	のような式を実現するマクロ
+	上記の例なら (case keyform ((key1 key2 ..) ...) (key3 ....) ((key4 key5 ..) ...)) となる
+	最後のkeyにotherwise記号を指定するとC言語のswitch文のdefaultみたいな"それ以外の値"の処理ができる
+	例 (setq x 10) (case x ((1 2) 'A) ((3 4) 'B) (5 'C) (otherwise 'D)) > D
+	ただし、keyにTやNILを指定する場合 quoteするかリストにするかしないといけない
+	例 (setq x t) (case x ((t) 'A) ((nil) 'B)) > A
+	例 (setq x nil) (case x ((quote t) 'A) ((quote nil) 'B)) > B
+	例 (setq x t) (case x ('t 'A) ('nil 'B)) > A
+
+◆tagbody特別式, go特別式
+	tagbody {tag | statement}*
+	引数がリストなら評価し、リスト以外ならタグとし
+	go特別式が現れると該当タグの引数の位置にジャンプしそこから評価を再開する
+	最後に評価された式（リスト）の値が返る
+	ラベルは識別子同様にたいていの文字の使用が可能
+
+	go tag
+	tagbody内に記述し該当タグまでtagbody内の引数をジャンプする
+	
+	例 (setq x 10 y 20) (tagbody (go label) (setq x 100) label (setq y 100)) (list x y) > (10 100)
+	
+	tagbodyを入れ子（ネスト）した場合に
+	同じ外側と内側に同じタグがある場合、内側スコープのタグが優先される
+	(tagbody
+		(tagbody 
+			(go label)
+			(tagbody 
+					label
+					(quot x)
+			)
+			label       ←このlabelにジャンプする
+			(quote y)
+		)
+		label
+		(quote z)
+	)
+
+◆block特別式, return-from特別式
+	block name {form}*
+	nameにはこのブロックの名前(識別子)を指定する
+	formの引数を順に評価していくがreturn-from で評価を中止して処理を抜ける
+	処理の最後に評価された値が戻り値になる
+	
+	return-from name [result]
+	nameで指定したブロックを抜ける
+	resultはreturn-formの戻り値とする値、省略時はNIL
+	return-fromの戻り値がnameブロックの最後に評価された値になるので結果としてnameブロックの戻り値にもなる
+
+	例 (block test 1 10 100) > 100
+	例 (block test 1 (return-from test 10) 100) > 10
+	例 (block test 1 (return-from test) 100) > NIL
+
+	blockの入れ子で内側から外側のブロックを抜けることもできる
+	(block outside (block inside (return-from outside 10) 100) 1000) > 10
+
+★returnマクロ
+	return [result]
+	return-from nil [result]と同じ
+	ブロック名がnilのときに使える
+	例  (block nil 1 (return 10) 100) > 10
+	
+★loopマクロ
+	loop {form}*
+	formに指定された引数を順番に評価していき最後の引数を評価したあとまた最初の引数から評価していく（無限ループする）
+	ループから抜けるには return-from nil [result] か return [result] をする（block nil {form}* 扱いか）
+
+	loopマクロのイメージ
+	(loop
+		(if (= i 0) (return i))
+		(setq x (cons i x))
+		(setq i (- i 1))
+	)
+	↓
+	(block nil
+		(tagbody
+			loop 	(if (= i 0) (return 0))
+					(setq x (cons i x))
+					(setq i (- i 1))
+					(go loop)
+		)
+	)
+
+★defunマクロ
+	defun function-name lambda-list form*
+	ユーザ関数を定義する
+	function-nameに関数名
+	lambda-list 引数リスト（ラムダリストと呼ばれる）引数いらないなら()の空リストしてい
+	form 評価する引数（式）、最後に評価された引数が関数の戻り値となる
+
+	例
+		(defun add (a b) (+ a b)) > ADD
+		(add 10 20) > 30
+	例
+		(defun test () 10) > TEST
+		(test) > 10
+	例
+		(defun test (x y z) (setq l nil) (cons x l) (cons y l) (cons z l)) > TEST
+		(test 10 20 30) > (30 20 10)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

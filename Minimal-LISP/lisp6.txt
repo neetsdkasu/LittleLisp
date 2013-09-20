@@ -1,0 +1,13 @@
+ƒlisp ‚Åeval‚ðl‚¦‚é
+
+—á
+LISP> (eval '(cons 'a 'b))
+(A . B)
+
+LISP> (eval '(cons (car '((a b c) d)) (cdr '(x (y z)))))
+((A B C) (Y Z))
+
+‚±‚ñ‚ÈŠ´‚¶‚¾‚ÆŽv‚í‚ê
+
+
+

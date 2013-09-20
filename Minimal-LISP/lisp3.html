@@ -1,0 +1,76 @@
+<html>
+<head><title>純LISP</title>
+<style><!--
+TH { font-size:x-small }
+TD { font-size:x-small }
+.a { font-size:x-small }
+.b { color:red }
+--></style>
+<script type="text/javascript" src="lisp3.js"></script>
+</head>
+<body>
+<h3>純LISP Test</h3>
+<div class="b">未完成・開発途中(2013/06/13)</div>
+<div class="a">制限事項<br>
+１行につき１つのリストしか設置できない（複数のリストを設置した場合エラーになる）<br>
+１つのリストを複数の行に分けて設置できない（複数の行に分けた場合エラーになる）<br>
+コメント文( ; (セミコロン)で始まる文)に対応してない（リストの後尾にコメント文がある場合エラーになる）
+</div>
+<div><a href="lisp3.js">ソースファイル(lisp3.js)</a></div>
+<hr>
+<h4>LISPコード入力</h4>
+<form name="f">
+<input type="button" value="実行する" onclick="test();"><textarea name="t" cols="160" rows="10">(label subst (lambda (x y z) (cond ((atom z) (cond ((eq y z) x) ((quote t) z))) ((quote t) (cons (subst x y (car z)) (subst x y (cdr z)))))))
+(subst '(X Y) 'B '(A (B C) A B C))
+</textarea><br>
+
+</form>
+<hr>
+<h4>実行結果</h4>
+<div id="abc"></div>
+
+<hr>
+<h4>開発デバッグ用出力</h4>
+<div id="efg"></div>
+<hr>
+<h4>説明(特別式)</h4>
+<table border="1">
+<tr><th>名前</th><th>引数</th><th>説明</th><th>例</th></tr>
+<tr><td>COND</td><td>(値 値)＊ (値 値)＊ ...</td>
+<td>引数の各リストを順次評価していく(リストは１つ以上必要)<br>引数のリストの先頭の値がNIL以外なら続く値を返す<br>
+引数のリストの先頭の値がNILなら次の引数のリストを評価する</td><td>(COND ('A 'B) ('T 'C)) ; B<br>(COND ('NIL 'B) ('T 'C)) ; C</td></tr>
+<tr><td>LAMBDA</td><td>(シンボル＊ シンボル＊ ...)＊ 値＊</td><td>ユーザ関数を設定する<br>第一引数のリスト内のシンボルはユーザ関数の仮引数となる<br>
+仮引数となるシンボルのリストは空でも可能<br>第二引数に実行する処理の値を渡す<br>ユーザ関数への参照を返す</td><td>(LAMBDA (X Y) (CONS (CONS X X) (CONS (Y Y))))<br>(LAMBDA () 'A)</td></tr>
+<tr><td>LABEL(DEFINE)</td><td>シンボル＊ 値or参照</td><td>第一引数のシンボルに第二引数の値or参照を設定する(変数設定)<br>
+第一引数のシンボルにT NIL COND LAMBDA LABEL QUOTE CONS CAR CDR EQ ATOMは使用できない</td><td>(LABEL A 'B)<br>(CONS A A) ; (B . B)<br>
+(LABEL F (LAMBDA (X Y) (CONS X Y)))<br>(F 'A 'B) ; (A . B)</td></tr>
+<tr><td>QUOTE</td><td>値＊</td><td>引数を評価せず返す<br> ' (シングルクオート)で略記できる</td><td>(QUOTE A) ; A<br>'A ; A<br>(QUOTE (A B)) ; (A B)<br>'(A B) ; (A B)</td></tr>
+</table>
+<div class="a">参照：関数や特別式の本体（中身）。リストを評価するときにリストの先頭に渡される実体。</div>
+<div class="a">値：シンボルもしくはリスト</div>
+<div class="a">＊：＊マークは関数・特別式の処理時に評価しない部分を表す（＊マークが無い引数は全て評価される）</div>
+<div class="a">評価：シンボルならLABELで設定された値を返す。リストならリストの先頭を関数または特別式、リストの後方を引数として処理する</div>
+<h4>説明(関数)</h4>
+<table border="1">
+<tr><th>名前</th><th>引数</th><th>説明</th><th>例</th></tr>
+<tr><td>CONS</td><td>値 値</td><td>２つの引数でリストを作る</td><td>(CONS 'A '(B C)) ; (A B C)</td></tr>
+<tr><td>CAR</td><td>リスト</td><td>リストの先頭を取り出す</td><td>(CAR '(A B C)) ; A<br>(CAR '()) ; ()</td></tr>
+<tr><td>CDR</td><td>リスト</td><td>リストの後方を取り出す</td><td>(CDR '(A B C)) ; (B C)<br>(CDR '()) ; ()</td></tr>
+<tr><td>EQ</td><td>値 値</td><td>２つの引数が同じシンボルならT<br>それ以外はNIL</td><td>(EQ 'A 'A) ; T<br>(EQ 'A 'B) ; NIL<br>(EQ '(A . B) '(A . B)) ; NIL</td></tr>
+<tr><td>ATOM</td><td>値</td><td>引数がシンボルならT<br>それ以外はNIL</td><td>(ATOM 'A) ; T<br>(ATOM '(A B)) ; NIL</td></tr>
+</table>
+<div class="a">値：シンボルもしくはリスト</div>
+<div class="a">＊：＊マークは評価しない部分を表す（＊マークが無い引数は全て評価される）</div>
+<div class="a">評価：シンボルならLABELで設定された値を返す。リストならリストの先頭を関数または特別式、リストの後方を引数として処理する</div>
+
+<h4>参考</h4>
+<div>
+純LISP - Wikipedia<br>
+http://ja.wikipedia.org/wiki/%E7%B4%94LISP
+</div>
+<div>
+RECURSIVE FUNCTIONS OF SYMBOLIC EXPRESSIONS AND THEIR COMPUTATION BY MACHINE (Part I)<br>
+http://www-formal.stanford.edu/jmc/recursive.html
+</div>
+</body>
+</html>
