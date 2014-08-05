@@ -1,7 +1,7 @@
-ƒlisp©•ª‚Åeval‚ğl‚¦‚é
+ç´”lispè‡ªåˆ†ã§evalã‚’è€ƒãˆã‚‹
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;ƒ†[ƒeƒBƒŠƒeƒBŠÖ”
+;ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°
 (label not (lambda (x) (cond (x (quote NIL)) ((quote T) (quote T)))))
 (label and (lambda (x y) (cond (x y) ((quote T) (quote NIL)))))
 (label equal (lambda (x y) (cond ((and (atom x) (atom y)) (eq x y)) ((and (not (atom x)) (not (atom y))) 
@@ -17,32 +17,32 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (cons (quote a) (cons (quote b) (quote NIL)))
-‚È‚Ç‚ğÀs‚·‚éê‡‚Í
+ãªã©ã‚’å®Ÿè¡Œã™ã‚‹å ´åˆã¯
 (exec list)
 (exec (quote (cons (quote a) (cons (quote b) (quote NIL)))))
 (atom list) -> (eval list (quote NIL))
 (quote T) -> (eval (car list) (cdr list))
-‚È‚Ç‚Æ‚·‚é
+ãªã©ã¨ã™ã‚‹
 
-;eval ’è‹`
+;eval å®šç¾©
 (eval list args)
-ˆø”list 	ƒVƒ“ƒ{ƒ‹‚Ìê‡‚Íˆø”args‚ÆƒŠƒXƒg‚É‚µ‚Ä“ñ’iŠK–Ú‚Åˆ—‚·‚éiLAMBDAŠÖ”‘Îôj
-ˆø”args 	Ä‹A‚ÅƒŠƒXƒg‚É’Ç‰Á‚µ‚Ä‚­‚±‚Æ‚Å•Ï”‚ğÀŒ»AÀˆø”‚ğƒŠƒXƒg‚Å“n‚·
+å¼•æ•°list 	ã‚·ãƒ³ãƒœãƒ«ã®å ´åˆã¯å¼•æ•°argsã¨ãƒªã‚¹ãƒˆã«ã—ã¦äºŒæ®µéšç›®ã§å‡¦ç†ã™ã‚‹ï¼ˆLAMBDAé–¢æ•°å¯¾ç­–ï¼‰
+å¼•æ•°args 	å†å¸°ã§ãƒªã‚¹ãƒˆã«è¿½åŠ ã—ã¦ãã“ã¨ã§å¤‰æ•°ã‚’å®Ÿç¾ã€å®Ÿå¼•æ•°ã‚’ãƒªã‚¹ãƒˆã§æ¸¡ã™
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;quote		(quote a)
 
-;‘æˆê’iŠK (eval quote (a))
+;ç¬¬ä¸€æ®µéš (eval quote (a))
 (eval (quote quote) (quote (a)))
-ˆø”list	quote
-ˆø”args	(a)
+å¼•æ•°list	quote
+å¼•æ•°args	(a)
 (atom list) ->
 	(eq list (quote QUOTE)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (quote a) (a))
-ˆø”list	(quote a)
-ˆø”args		(a)
+;ç¬¬äºŒæ®µéš (eval (quote a) (a))
+å¼•æ•°list	(quote a)
+å¼•æ•°args		(a)
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote QUOTE)) -> (cadr list) ; (cadr list) => a
@@ -51,16 +51,16 @@
 
 ;atom 		(atom (quote (a b)))
 
-;‘æˆê’iŠK (eval atom ((quote (a b))))
+;ç¬¬ä¸€æ®µéš (eval atom ((quote (a b))))
 (eval (quote atom) (quote ((quote (a b)))))
-ˆø”list	atom
-ˆø”args	((quote (a b)))
+å¼•æ•°list	atom
+å¼•æ•°args	((quote (a b)))
 (atom list) ->
 	(eq list (quote ATOM)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (atom (quote (a b))) ((quote (a b))))
-ˆø”list	(atom (quote (a b))) ; (atom . ((quote . ((a . (b . NIL)) . NIL)) . NIL))
-ˆø”args	((quote (a b)))
+;ç¬¬äºŒæ®µéš (eval (atom (quote (a b))) ((quote (a b))))
+å¼•æ•°list	(atom (quote (a b))) ; (atom . ((quote . ((a . (b . NIL)) . NIL)) . NIL))
+å¼•æ•°args	((quote (a b)))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote ATOM)) -> (atom (eval (cadr list) args)) ; (cadr list) => (quote (a b))
@@ -69,16 +69,16 @@
 
 ;car		(car (quote (a b c)))
 
-;‘æˆê’iŠK (eval car ((quote (a b c))))
+;ç¬¬ä¸€æ®µéš (eval car ((quote (a b c))))
 (eval (quote car) (quote ((quote (a b c)))))
-ˆø”list	car
-ˆø”args	((quote (a b c)))
+å¼•æ•°list	car
+å¼•æ•°args	((quote (a b c)))
 (atom list) ->
 	(eq list (quote CAR)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (car (quote (a b c))) ((quote (a b c))))
-ˆø”list	(car (quote (a b c))) ; (car . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
-ˆø”args	((quote (a b c)))
+;ç¬¬äºŒæ®µéš (eval (car (quote (a b c))) ((quote (a b c))))
+å¼•æ•°list	(car (quote (a b c))) ; (car . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
+å¼•æ•°args	((quote (a b c)))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote CAR)) -> (car (eval (cadr list) args)) ; (cadr list) => (quote (a b c))
@@ -87,15 +87,15 @@
 
 ;cdr		(cdr (quote (a b c)))
 
-;‘æˆê’iŠK (eval cdr ((quote (a b c))))
-ˆø”list	cdr
-ˆø”args	((quote (a b c)))
+;ç¬¬ä¸€æ®µéš (eval cdr ((quote (a b c))))
+å¼•æ•°list	cdr
+å¼•æ•°args	((quote (a b c)))
 (atom list) ->
 	(eq list (quote CDR)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (cdr (quote (a b c))) ((quote (a b c))))
-ˆø”list	(cdr (quote (a b c))) ; (cdr . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
-ˆø”args	((quote (a b c)))
+;ç¬¬äºŒæ®µéš (eval (cdr (quote (a b c))) ((quote (a b c))))
+å¼•æ•°list	(cdr (quote (a b c))) ; (cdr . ((quote . ((a . (b . (c . NIL))) . NIL)) . NIL))
+å¼•æ•°args	((quote (a b c)))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote CDR)) -> (cdr (eval (cadr list) args)) ; (cadr list) => (quote (a b c))
@@ -104,15 +104,15 @@
 
 ;eq			(eq (quote a) (quote b))
 
-;‘æˆê’iŠK (eval (quote eq) (quote ((quote a) (quote b))))
-ˆø”list	eq
-ˆø”args	((quote a) (quote b))
+;ç¬¬ä¸€æ®µéš (eval (quote eq) (quote ((quote a) (quote b))))
+å¼•æ•°list	eq
+å¼•æ•°args	((quote a) (quote b))
 (atom list) ->
 	(eq list (quote EQ)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (eq (quote a) (quote b)) ((quote a) (quote b)))
-ˆø”list	(eq (quote a) (quote b))
-ˆø”args	((quote a) (quote b))
+;ç¬¬äºŒæ®µéš (eval (eq (quote a) (quote b)) ((quote a) (quote b)))
+å¼•æ•°list	(eq (quote a) (quote b))
+å¼•æ•°args	((quote a) (quote b))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote EQ)) -> (eq (eval (cadr list) args) (eval (caddr list) args))
@@ -122,15 +122,15 @@
 
 ;cons		(cons (quote a) (quote b))
 
-;‘æˆê’iŠK (eval (quote cons) (quote ((quote a) (quote b))))
-ˆø”list	cons
-ˆø”args	((quote a) (quote b))
+;ç¬¬ä¸€æ®µéš (eval (quote cons) (quote ((quote a) (quote b))))
+å¼•æ•°list	cons
+å¼•æ•°args	((quote a) (quote b))
 (atom list) ->
 	(eq list (quote CONS)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (cons (quote a) (quote b)) ((quote a) (quote b)))
-ˆø”list	(cons (quote a) (quote b))
-ˆø”args	((quote a) (quote b))
+;ç¬¬äºŒæ®µéš (eval (cons (quote a) (quote b)) ((quote a) (quote b)))
+å¼•æ•°list	(cons (quote a) (quote b))
+å¼•æ•°args	((quote a) (quote b))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote CONS)) -> (cons (eval (cadr list) args) (eval (caddr list) args))
@@ -140,68 +140,68 @@
 
 ;cond		(cond ((f a) b) ((f c) d) ((quote T) e))
 
-;‘æˆê’iŠK (eval cond (((f a) b) ((f c) d) ((quote T) e)))
+;ç¬¬ä¸€æ®µéš (eval cond (((f a) b) ((f c) d) ((quote T) e)))
 (eval (quote cond) (quote (((f a) b) ((f c) d) ((quote T) e))))
-ˆø”list	cond
-ˆø”args	(((f a) b) ((f c) d) ((quote T) e))
+å¼•æ•°list	cond
+å¼•æ•°args	(((f a) b) ((f c) d) ((quote T) e))
 (atom list) ->
 	(eq list (quote COND)) -> (eval (cons list args) args)
 
-;‘æ“ñˆø” (eval (cond ((f a) b) ((f c) d) ((quote T) e)) (((f a) b) ((f c) d) ((quote T) e)))
-ˆø”list	(cond ((f a) b) ((f c) d) ((quote T) e))
-ˆø”args	(((f a) b) ((f c) d) ((quote T) e))
+;ç¬¬äºŒå¼•æ•° (eval (cond ((f a) b) ((f c) d) ((quote T) e)) (((f a) b) ((f c) d) ((quote T) e)))
+å¼•æ•°list	(cond ((f a) b) ((f c) d) ((quote T) e))
+å¼•æ•°args	(((f a) b) ((f c) d) ((quote T) e))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote COND)) -> (cond ((eval (caadr list) args) (eval (cdadr list) args)) ((quote T) (eval (cons (quote COND) (cddr list)) args)))
 			; (caadr list) => (f a), (cdadr list) => b, (cddr list) => (((f c) d) ((quote T) e))
-			;‚±‚Ì•û–@‚¾‚Æ (f a) ‚Å•Ï”‚ª¶¬‚³‚ê‚éê‡‚É b ‚Ìˆ—‚É‚»‚Ì•Ï”‚ª”½‰f‚³‚ê‚È‚¢ ‘ã‚í‚è‚Ìˆ—‚ª•K—v
+			;ã“ã®æ–¹æ³•ã ã¨ (f a) ã§å¤‰æ•°ãŒç”Ÿæˆã•ã‚Œã‚‹å ´åˆã« b ã®å‡¦ç†ã«ãã®å¤‰æ•°ãŒåæ˜ ã•ã‚Œãªã„ ä»£ã‚ã‚Šã®å‡¦ç†ãŒå¿…è¦
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;lambda		(lambda (x y) (cons (cons x x) y))
 
-;‘æˆê’iŠK (eval lambda ((x y) (cons (cons x x) y)))
+;ç¬¬ä¸€æ®µéš (eval lambda ((x y) (cons (cons x x) y)))
 (eval (quote lambda) (quote ((x y) (cons (cons x x) y))))
-ˆø”list	lambda
-ˆø”args	((x y) (cons (cons x x ) y))
+å¼•æ•°list	lambda
+å¼•æ•°args	((x y) (cons (cons x x ) y))
 (atom list) ->
 	(eq list (quote LAMBDA) -> (cons list args)
-		;lambda‚Ì’è‹`‚ğ•Ô‚· (lambda (x y) (cons (cons x x) y))
+		;lambdaã®å®šç¾©ã‚’è¿”ã™ (lambda (x y) (cons (cons x x) y))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;label		(label a (quote (b c d)))
 
-;‘æˆê’iŠK (eval label (a (quote (b c d))))
+;ç¬¬ä¸€æ®µéš (eval label (a (quote (b c d))))
 (eval (quote label) (quote (a (quote (b c d)))))
-ˆø”list	label
-ˆø”args	(a (quote (b c d)))
+å¼•æ•°list	label
+å¼•æ•°args	(a (quote (b c d)))
 (atom list) ->
 	(eq list (quote LABEL)) -> (eval (cons list args) args)
 
-;‘æ“ñ’iŠK (eval (label a (quote (b c d))) (a (quote (b c d))))
-ˆø”list	(label a (quote (b c d)))
-ˆø”args	(a (quote (b c d)))
+;ç¬¬äºŒæ®µéš (eval (label a (quote (b c d))) (a (quote (b c d))))
+å¼•æ•°list	(label a (quote (b c d)))
+å¼•æ•°args	(a (quote (b c d)))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote LABEL)) -> 
 			(atom (cadr list)) -> (cadr list) ; (cadr list) => a
-				; •Ï”‚ğ‚Ç‚¤ŠÇ—‚·‚é‚©
-			;(cons (cadr list) (eval (cddr list) args)) ; => (a . (b c d)) ‚Íì‚ê‚é‚ªEEE
-			;‚Ç‚¤‚â‚Á‚Äargs‚ğˆø‚«Œp‚®‚ñ‚¾H–ß‚è’l‚É‚·‚é‚Ì‚©H
+				; å¤‰æ•°ã‚’ã©ã†ç®¡ç†ã™ã‚‹ã‹
+			;(cons (cadr list) (eval (cddr list) args)) ; => (a . (b c d)) ã¯ä½œã‚Œã‚‹ãŒãƒ»ãƒ»ãƒ»
+			;ã©ã†ã‚„ã£ã¦argsã‚’å¼•ãç¶™ãã‚“ã ï¼Ÿæˆ»ã‚Šå€¤ã«ã™ã‚‹ã®ã‹ï¼Ÿ
 
-;ˆê‰ñ‚Ìeval‚É“n‚¹‚élabel‚Ì”‚Í‚Ç‚Ì’ö“xHlabel‚Ì—LŒø”ÍˆÍ‚ÍH
-;(cond ((label a 'b) (cons a a)) ('T a)) ; ‚±‚ÌÅŒã‚Ìa‚Ålabel‚Ì’l‚Í—LŒøH
-;(cons (cons (label a 'XX) (label b 'YY)) (b a)) ;‚±‚ñ‚È‚Ì‚Ç‚¤‚·‚é‚ñ‚¾
-;(label a (cons (label c 'ccc) (label c 'xxx))) ;‚±‚ñ‚ÈƒoƒJ‚İ‚½‚¢‚Ì‚àl‚¦‚ç‚ê‚é
+;ä¸€å›ã®evalã«æ¸¡ã›ã‚‹labelã®æ•°ã¯ã©ã®ç¨‹åº¦ï¼Ÿlabelã®æœ‰åŠ¹ç¯„å›²ã¯ï¼Ÿ
+;(cond ((label a 'b) (cons a a)) ('T a)) ; ã“ã®æœ€å¾Œã®aã§labelã®å€¤ã¯æœ‰åŠ¹ï¼Ÿ
+;(cons (cons (label a 'XX) (label b 'YY)) (b a)) ;ã“ã‚“ãªã®ã©ã†ã™ã‚‹ã‚“ã 
+;(label a (cons (label c 'ccc) (label c 'xxx))) ;ã“ã‚“ãªãƒã‚«ã¿ãŸã„ã®ã‚‚è€ƒãˆã‚‰ã‚Œã‚‹
 
-;l‚¦‚ç‚ê‚éô‚Æ‚µ‚Äæ‚Élabel•¶‚¾‚¯’Šo‚µ‚Ä‚Í•Ï”ƒŠƒXƒg‚É•ÏŠ·‚µ‚Ä–ß‚è’l‚É‚·‚éŠÖ”‚ª•K—v‚Æ‚©‚©H
+;è€ƒãˆã‚‰ã‚Œã‚‹ç­–ã¨ã—ã¦å…ˆã«labelæ–‡ã ã‘æŠ½å‡ºã—ã¦ã¯å¤‰æ•°ãƒªã‚¹ãƒˆã«å¤‰æ›ã—ã¦æˆ»ã‚Šå€¤ã«ã™ã‚‹é–¢æ•°ãŒå¿…è¦ã¨ã‹ã‹ï¼Ÿ
 ;
 
-;•Ï”‚ÌƒŠƒXƒg
-;  ((ING . c) . (((1 2 3) . b)  . (((x y z) . a) . (––”öNIL‚ÌƒƒŠƒXƒg‚È‚çNIL‚Å‚à‚È‚ñ‚Å‚à))))
+;å¤‰æ•°ã®ãƒªã‚¹ãƒˆ
+;  ((ING . c) . (((1 2 3) . b)  . (((x y z) . a) . (æœ«å°¾NILã®ç´”ãƒªã‚¹ãƒˆãªã‚‰NILã§ã‚‚ãªã‚“ã§ã‚‚))))
 
-;findvar •Ï”ƒŠƒXƒgargs‚É•Ï”–¼symbol‚ª‚ ‚ê‚ÎTA‚È‚¯‚ê‚ÎNIL‚ğ•Ô‚·
+;findvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã«å¤‰æ•°åsymbolãŒã‚ã‚Œã°Tã€ãªã‘ã‚Œã°NILã‚’è¿”ã™
 (label findvar (lambda (args symbol)
 	(cond 
 		((not (atom args)) (cond
@@ -214,7 +214,7 @@
 		((quote t) (quote NIL)))
 	))
 
-;repvar •Ï”ƒŠƒXƒgargs‚É•Ï”–¼symbol‚ª‚ ‚ê‚Îˆê”Ôè‘O‚É‚ ‚é‚»‚Ì•Ï”‚Ì’l‚ğvalue‚É’u‚«Š·‚¦‚½•Ï”ƒŠƒXƒg‚ğ•Ô‚·A‚È‚¯‚ê‚ÎŒ³‚Ì•Ï”ƒŠƒXƒg‚ğ‚»‚Ì‚Ü‚Ü•Ô‚·
+;repvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã«å¤‰æ•°åsymbolãŒã‚ã‚Œã°ä¸€ç•ªæ‰‹å‰ã«ã‚ã‚‹ãã®å¤‰æ•°ã®å€¤ã‚’valueã«ç½®ãæ›ãˆãŸå¤‰æ•°ãƒªã‚¹ãƒˆã‚’è¿”ã™ã€ãªã‘ã‚Œã°å…ƒã®å¤‰æ•°ãƒªã‚¹ãƒˆã‚’ãã®ã¾ã¾è¿”ã™
 (label repvar (lambda (args symbol value)
 	(cond 
 		((not (atom args)) (cond
@@ -227,7 +227,7 @@
 		((quote t) args))
 	))
 
-;delvar •Ï”ƒŠƒXƒgargs‚É•Ï”–¼symbol‚ª‚ ‚ê‚Îˆê”Ôè‘O‚É‚ ‚é‚»‚Ì–¼‚Ì•Ï”‚ğíœ‚µ‚½•Ï”ƒŠƒXƒg‚ğ•Ô‚·A‚È‚¯‚ê‚ÎŒ³‚Ì•Ï”ƒŠƒXƒg‚ğ‚»‚Ì‚Ü‚Ü•Ô‚·
+;delvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã«å¤‰æ•°åsymbolãŒã‚ã‚Œã°ä¸€ç•ªæ‰‹å‰ã«ã‚ã‚‹ãã®åã®å¤‰æ•°ã‚’å‰Šé™¤ã—ãŸå¤‰æ•°ãƒªã‚¹ãƒˆã‚’è¿”ã™ã€ãªã‘ã‚Œã°å…ƒã®å¤‰æ•°ãƒªã‚¹ãƒˆã‚’ãã®ã¾ã¾è¿”ã™
 (label delvar (lambda (args symbol)
 	(cond 
 		((not (atom args)) (cond
@@ -240,18 +240,18 @@
 		((quote t) args))
 	))
 
-;addvar •Ï”ƒŠƒXƒgargs‚Ìˆê”Ôè‘O‚É•Ï”–¼symbol’lvalue‚Ì•Ï”‚ğ’Ç‰Á‚·‚é
+;addvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã®ä¸€ç•ªæ‰‹å‰ã«å¤‰æ•°åsymbolå€¤valueã®å¤‰æ•°ã‚’è¿½åŠ ã™ã‚‹
 (label addvar (lambda (args symbol value)
 	(cons (cons value symbol) args)))
 
-;setvar •Ï”ƒŠƒXƒgargs‚É•Ï”–¼symbol‚ª‚ ‚ê‚Î’l‚ğvalue‚É’u‚«Š·‚¦‚éA‚È‚¯‚ê‚ÎV‚µ‚­’Ç‰Á‚·‚é
+;setvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã«å¤‰æ•°åsymbolãŒã‚ã‚Œã°å€¤ã‚’valueã«ç½®ãæ›ãˆã‚‹ã€ãªã‘ã‚Œã°æ–°ã—ãè¿½åŠ ã™ã‚‹
 (label setvar (lambda (args symbol value)
 	(cond 
 		((findvar args symbol) (repvar args symbol value))
 		((quote t) (addvar args symbol value)))
 	))
 
-;getvar •Ï”ƒŠƒXƒgargs‚É•Ï”–¼symbol‚ª‚ ‚ê‚Îˆê”Ôè‘O‚É‚ ‚é‚»‚Ì•Ï”‚Ì’l‚ğ•Ô‚·A‚È‚¯‚ê‚ÎƒVƒ“ƒ{ƒ‹ERROR‚ğ•Ô‚·
+;getvar å¤‰æ•°ãƒªã‚¹ãƒˆargsã«å¤‰æ•°åsymbolãŒã‚ã‚Œã°ä¸€ç•ªæ‰‹å‰ã«ã‚ã‚‹ãã®å¤‰æ•°ã®å€¤ã‚’è¿”ã™ã€ãªã‘ã‚Œã°ã‚·ãƒ³ãƒœãƒ«ERRORã‚’è¿”ã™
 (label getvar (lambda (args symbol)
 	(cond 
 		((not (atom args)) (cond
@@ -267,175 +267,175 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;•Ï”		var
+;å¤‰æ•°		var
 
-‘æˆê’iŠK (eval var (NIL))
+ç¬¬ä¸€æ®µéš (eval var (NIL))
 (eval (quote var) (quote (NIL)))
-ˆø”list	var
-ˆø”args	(NIL)
-	; ‚±‚±‚Åargs‚ÉŠi”[‚³‚ê‚Ä‚¢‚é’l‚ğ•Ô‚¹‚Î‚¢‚¢‚Ì‚©H
-	; ‚¢‚âA‚±‚±‚Å•Ô‚·‚×‚«‚¾‚È
+å¼•æ•°list	var
+å¼•æ•°args	(NIL)
+	; ã“ã“ã§argsã«æ ¼ç´ã•ã‚Œã¦ã„ã‚‹å€¤ã‚’è¿”ã›ã°ã„ã„ã®ã‹ï¼Ÿ
+	; ã„ã‚„ã€ã“ã“ã§è¿”ã™ã¹ãã ãª
 
-;ŠÖ”		(func (quote a) (quote b))
+;é–¢æ•°		(func (quote a) (quote b))
 
-‘æˆê’iŠK (eval func ((quote a) (quote b)))
+ç¬¬ä¸€æ®µéš (eval func ((quote a) (quote b)))
 (eval (quote func) (quote ((quote a) (qoute b))))
-ˆø”list	func
-ˆø”args	((quote a) (quote b))
+å¼•æ•°list	func
+å¼•æ•°args	((quote a) (quote b))
 (atom list) ->
-	;func‚ğæ‚èo‚µ‚Ä(lambdaŠÖ”)‚Åˆø”‚Æcons‚·‚é‚Ì‚©H
+	;funcã‚’å–ã‚Šå‡ºã—ã¦(lambdaé–¢æ•°)ã§å¼•æ•°ã¨consã™ã‚‹ã®ã‹ï¼Ÿ
 
-‘æ“ñ’iŠK (eval (func (quote a) (quote b)) ((quote a) (quote b))
-ˆø”list	(func (quote a) (quote b))
-ˆø”args	((quote a) (quote b))
-	;‚±‚Ì“_‚Åargs‚Éfunc‚Ìî•ñ‚ª‚È‚¯‚è‚á‚Ç‚¤‚µ‚æ‚¤‚à‚È‚¢‚ñ‚¾‚ª
-	;func‚Ì’l(lambdaŠÖ”)‚ğæ‚èo‚µ‚Äˆø”‚Æcons‚·‚é‚©H
+ç¬¬äºŒæ®µéš (eval (func (quote a) (quote b)) ((quote a) (quote b))
+å¼•æ•°list	(func (quote a) (quote b))
+å¼•æ•°args	((quote a) (quote b))
+	;ã“ã®æ™‚ç‚¹ã§argsã«funcã®æƒ…å ±ãŒãªã‘ã‚Šã‚ƒã©ã†ã—ã‚ˆã†ã‚‚ãªã„ã‚“ã ãŒ
+	;funcã®å€¤(lambdaé–¢æ•°)ã‚’å–ã‚Šå‡ºã—ã¦å¼•æ•°ã¨consã™ã‚‹ã‹ï¼Ÿ
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;lambdaŠÖ”		((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
+;lambdaé–¢æ•°		((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
 
-‘æˆê’iŠK (eval (lambda (x y) (cons (cons x x) y)) ((quote A) (quote B)))
+ç¬¬ä¸€æ®µéš (eval (lambda (x y) (cons (cons x x) y)) ((quote A) (quote B)))
 (eval (quote (lambda (x y) (cons (cons x x) y)) (quote ((quote A) (quote B)))))
-ˆø”list	(lambda (x y) (cons (cons x x) y))
-ˆø”args	((quote A) (quote B))
+å¼•æ•°list	(lambda (x y) (cons (cons x x) y))
+å¼•æ•°args	((quote A) (quote B))
 (not (atom list)) ->
 	(atom (car list)) ->
 		(eq (car list) (quote LAMBDA)) -> (cons list args)
 
-‘æ“ñ’iŠK (eval ((lambda (x y) (cons (cons x x) y)) (quote A) (quote B)) ((quote A) (quote B)))
-ˆø”list	((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
-ˆø”args	((quote A) (quote B))
-		;(cadr list)‚Å‰¼ˆø”(x y) (cdddr list)‚ÅÀˆø”((quote A) (quote B))
-		;(caddr list)‚ÅŠÖ”–{‘Ì
-		;‰¼ˆø”‚ÆÀˆø”‚ğŒ‹‚Ñ•t‚¯args‚ÉŠi”[‚·‚é‚©‚Å(eval ŠÖ”–{‘Ì •Ï”ƒŠƒXƒg)‚Æ‚©‚É‚·‚é‚×‚«‚©
+ç¬¬äºŒæ®µéš (eval ((lambda (x y) (cons (cons x x) y)) (quote A) (quote B)) ((quote A) (quote B)))
+å¼•æ•°list	((lambda (x y) (cons (cons x x) y)) (quote A) (quote B))
+å¼•æ•°args	((quote A) (quote B))
+		;(cadr list)ã§ä»®å¼•æ•°(x y) (cdddr list)ã§å®Ÿå¼•æ•°((quote A) (quote B))
+		;(caddr list)ã§é–¢æ•°æœ¬ä½“
+		;ä»®å¼•æ•°ã¨å®Ÿå¼•æ•°ã‚’çµã³ä»˜ã‘argsã«æ ¼ç´ã™ã‚‹ã‹ã§(eval é–¢æ•°æœ¬ä½“ å¤‰æ•°ãƒªã‚¹ãƒˆ)ã¨ã‹ã«ã™ã‚‹ã¹ãã‹
 
-		;‚Æ‚È‚é‚Æargs‚ª•Ï”ƒŠƒXƒg‚©ˆø”ƒŠƒXƒg‚©A‰½‚ç‚©‚Ì‹æ•Ê‚ª•K—v‚©H
-		;‚à‚µ‚©‚µ‚Ä‘æˆê’iŠK‚ÌevalŒÄ‚Ño‚µ‚Íargs‚Í‚¢‚ç‚È‚¢‚©H
+		;ã¨ãªã‚‹ã¨argsãŒå¤‰æ•°ãƒªã‚¹ãƒˆã‹å¼•æ•°ãƒªã‚¹ãƒˆã‹ã€ä½•ã‚‰ã‹ã®åŒºåˆ¥ãŒå¿…è¦ã‹ï¼Ÿ
+		;ã‚‚ã—ã‹ã—ã¦ç¬¬ä¸€æ®µéšã®evalå‘¼ã³å‡ºã—ã¯argsã¯ã„ã‚‰ãªã„ã‹ï¼Ÿ
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;‰º‹L‚Ì’è‹`‚Å‚ÍƒAƒJƒ“@i•Ï”‚ªˆ—‚Å‚«‚È‚¢j
+;ä¸‹è¨˜ã®å®šç¾©ã§ã¯ã‚¢ã‚«ãƒ³ã€€ï¼ˆå¤‰æ•°ãŒå‡¦ç†ã§ããªã„ï¼‰
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-:eval ’è‹`
+:eval å®šç¾©
 (eval list)
 
 ;quote
 (eval (qute (quote a))
 
-ˆø”list (quote a) ; (quote . (a . NIL))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote QUOTE)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL))  ; T (NIL‚È‚çˆø”‚QˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (cadr list)
+å¼•æ•°list (quote a) ; (quote . (a . NIL))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote QUOTE)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL))  ; T (NILãªã‚‰å¼•æ•°ï¼’ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (cadr list)
 
 
 ;atom
 (eval (quote (atom (quote a))))
 
-ˆø”list (atom (quote a)) ; (atom . ((quote . (a . NIL)) . NIL))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote ATOM)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚QˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (atom (eval (cadr list))) ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (atom (quote a)) ; (atom . ((quote . (a . NIL)) . NIL))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote ATOM)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼’ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (atom (eval (cadr list))) ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 ;eq
 (eval (quote (eq (quote a) (quote b))))
 
-ˆø”list (eq (quote a) (quote b)) ; (eq . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote EQ)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚P‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cdddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚RˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (eq (eval (cadr list)) (eval (caddr list))) ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (eq (quote a) (quote b)) ; (eq . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote EQ)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼‘ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cdddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼“ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (eq (eval (cadr list)) (eval (caddr list))) ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 ;cons
 (eval (quote (cons (quote a) (quote b))))
 
-ˆø”list (cons (quote a) (quote b)) ; (cons . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote CONS)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚P‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cdddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚RˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (cons (eval (cadr list)) (eval (caddr list))) ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (cons (quote a) (quote b)) ; (cons . ((quote . (a . NIL)) . ((quote . (b . NIL)) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote CONS)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼‘ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cdddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼“ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (cons (eval (cadr list)) (eval (caddr list))) ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 ;car
 (eval (quote (car (quote (a b c)))))
 
-ˆø”list (car (quote (a b c))) ; (car . (quote . ((a . (b . (c . NIL))) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote CAR)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚QˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (car (eval (cadr list))) ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (car (quote (a b c))) ; (car . (quote . ((a . (b . (c . NIL))) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote CAR)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼’ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (car (eval (cadr list))) ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 
 ;cdr
 (eval (quote (cdr (quote (a b c)))))
 
-ˆø”list (cdr (quote (a b c))) ; (cdr . (quote . ((a . (b . (c . NIL))) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote CAR)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚QˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l (cdr (eval (cadr list))) ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (cdr (quote (a b c))) ; (cdr . (quote . ((a . (b . (c . NIL))) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote CAR)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼’ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ (cdr (eval (cadr list))) ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 ;label
 (eval (quote (label a (quote b))))
 
-ˆø”list (label a (quote b)) ; (label . (a . ((quote . (b . NIL)) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote LABEL)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚P‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cdddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚RˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ6 (atom (cadr list)) ; T (NIL‚È‚ç•Ï”–¼‚ªƒVƒ“ƒ{ƒ‹‚¶‚á‚È‚¢A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢))
-–ß‚è’l (cadr list)
-•K—v‚Èˆ— (eval (caddr list)) ‚ÌŒ‹‰Ê•Û‘¶ ; ‚±‚Ìeval‚ÌŒÄ‚Ñ•û‚¾‚Æ•Ï”‚ğ“n‚¹‚È‚¢
+å¼•æ•°list (label a (quote b)) ; (label . (a . ((quote . (b . NIL)) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote LABEL)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼‘ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cdddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼“ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶6 (atom (cadr list)) ; T (NILãªã‚‰å¤‰æ•°åãŒã‚·ãƒ³ãƒœãƒ«ã˜ã‚ƒãªã„ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„))
+æˆ»ã‚Šå€¤ (cadr list)
+å¿…è¦ãªå‡¦ç† (eval (caddr list)) ã®çµæœä¿å­˜ ; ã“ã®evalã®å‘¼ã³æ–¹ã ã¨å¤‰æ•°ã‚’æ¸¡ã›ãªã„
 
 
 ;lambda
 (eval (quote (lambda (x) (cons x x))))
 
-ˆø”list (lambda (x) (cons x x)) ; (lambda . ((x . NIL) . ((cons . (x . (x . NIL))) . NIL)))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote LAMBDA)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (equal (cddr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚P‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cdddr list) (quote NIL)) ; T (NIL‚È‚çˆø”‚RˆÈã‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ6 (atom (cadr list)) ; NIL (T‚È‚çƒ‰ƒ€ƒ_ƒŠƒXƒg‚ªƒŠƒXƒg‚Å‚È‚¢A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢))
-–ß‚è’l list
+å¼•æ•°list (lambda (x) (cons x x)) ; (lambda . ((x . NIL) . ((cons . (x . (x . NIL))) . NIL)))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote LAMBDA)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (equal (cddr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼‘ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cdddr list) (quote NIL)) ; T (NILãªã‚‰å¼•æ•°ï¼“ä»¥ä¸Šã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶6 (atom (cadr list)) ; NIL (Tãªã‚‰ãƒ©ãƒ ãƒ€ãƒªã‚¹ãƒˆãŒãƒªã‚¹ãƒˆã§ãªã„ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„))
+æˆ»ã‚Šå€¤ list
 
 
 ;cond
 (eval (quote (cond ((atom a) b) ((quote T) c))))
 
-ˆø”list (cond ((atom a) b) ((quote T) c)) ; (cond . (((atom . (a . NIL)) . (b . NIL)) . ((quote . (T . NIL)) . ((c . NIL) . NIL))))
-ğŒ1 (atom list) ; NIL
-ğŒ2 (equal (car list) (quote COND)) ; T
-ğŒ3 (equal (cdr list) (quote NIL)) ; NIL (T‚È‚çˆø”‚O‚ÌƒGƒ‰[A‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ4 (atom (cadr list)) ; NIL	(T‚È‚çˆø”‚ªƒVƒ“ƒ{ƒ‹‚É‚È‚Á‚Ä‚éA‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cdadr list) (quote NIL)) ; NIL (T‚È‚ç‘æˆêˆø”‚ÌƒŠƒXƒg‚Ì—v‘f‚ª‚PA‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-ğŒ5 (equal (cddadr list) (quote NIL)) ; T (NIL‚È‚ç‘æˆêˆø”‚ÌƒŠƒXƒg‚Ì—v‘f‚ª‚RˆÈãA‚µ‚©‚µ”CˆÓ‚ÌƒGƒ‰[‚Ì”­¶‚Ío—ˆ‚È‚¢)
-–ß‚è’l ğŒ®‚ªT‚É‚È‚Á‚½‚Æ‚±‚ë‚Ì–ß‚è’l®
-•K—v‚Èˆ— ğŒ®‚ªT‚É‚È‚é‚Ü‚ÅÄ‹A“I‚ÉğŒ®‚ğ•]‰¿‚·‚é•K—v‚ª‚ ‚é
+å¼•æ•°list (cond ((atom a) b) ((quote T) c)) ; (cond . (((atom . (a . NIL)) . (b . NIL)) . ((quote . (T . NIL)) . ((c . NIL) . NIL))))
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (equal (car list) (quote COND)) ; T
+æ¡ä»¶3 (equal (cdr list) (quote NIL)) ; NIL (Tãªã‚‰å¼•æ•°ï¼ã®ã‚¨ãƒ©ãƒ¼ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶4 (atom (cadr list)) ; NIL	(Tãªã‚‰å¼•æ•°ãŒã‚·ãƒ³ãƒœãƒ«ã«ãªã£ã¦ã‚‹ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cdadr list) (quote NIL)) ; NIL (Tãªã‚‰ç¬¬ä¸€å¼•æ•°ã®ãƒªã‚¹ãƒˆã®è¦ç´ ãŒï¼‘ã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æ¡ä»¶5 (equal (cddadr list) (quote NIL)) ; T (NILãªã‚‰ç¬¬ä¸€å¼•æ•°ã®ãƒªã‚¹ãƒˆã®è¦ç´ ãŒï¼“ä»¥ä¸Šã€ã—ã‹ã—ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ã®ç™ºç”Ÿã¯å‡ºæ¥ãªã„)
+æˆ»ã‚Šå€¤ æ¡ä»¶å¼ãŒTã«ãªã£ãŸã¨ã“ã‚ã®æˆ»ã‚Šå€¤å¼
+å¿…è¦ãªå‡¦ç† æ¡ä»¶å¼ãŒTã«ãªã‚‹ã¾ã§å†å¸°çš„ã«æ¡ä»¶å¼ã‚’è©•ä¾¡ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
 
-;lambdaŠÖ”
+;lambdaé–¢æ•°
 (eval (quote ((lambda (x y) (cons y x)) (quote (a b)) (quote c))))
 
-ˆø”list ((lambda (x y) (cons y x)) (quote (a b)) (quote c)) ; 
-ğŒ1 (atom list) ; NIL
-ğŒ2 (atom (car list)) ; NIL
-ğŒ3 (equal (caar list) (quote LAMBDA))
-ğŒ4 (cadar list)‚Æ(cdr list)‚Ì”‚ªˆê’v ; ‰¼ˆø”‚ÆÀˆø”‚Ì”‚ªˆê’vs
+å¼•æ•°list ((lambda (x y) (cons y x)) (quote (a b)) (quote c)) ; 
+æ¡ä»¶1 (atom list) ; NIL
+æ¡ä»¶2 (atom (car list)) ; NIL
+æ¡ä»¶3 (equal (caar list) (quote LAMBDA))
+æ¡ä»¶4 (cadar list)ã¨(cdr list)ã®æ•°ãŒä¸€è‡´ ; ä»®å¼•æ•°ã¨å®Ÿå¼•æ•°ã®æ•°ãŒä¸€è‡´s

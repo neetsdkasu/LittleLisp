@@ -1,18 +1,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ��LISP �I���W�i�� eval
+;; 純LISP オリジナル eval
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LastUpdate   2013/06/26
 ;; Version      1.2.0
-;; Author       ���ꂨ�� (takeiteasy_idontthinkso)
+;; Author       おれおれ (takeiteasy_idontthinkso)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ��LISP�̃y�[�W�̃e�L�X�g�G���A�ɂ��̃t�@�C���̒��g�S���܂邲�ƃR�s�y�Ŏ��s
-;; ���̃t�@�C���̍Ō�Ƀe�X�g�p��EVAL�R�[�h�������Ă���܂�(���ӁF���d��)
+;; 純LISPのページのテキストエリアにこのファイルの中身全部まるごとコピペで実行
+;; このファイルの最後にテスト用のEVALコードが書いてあります(注意：糞重い)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ����eval�R�[�h�͉��LURL�Ō��J�̎��̏�LISP�̎d�l���Č����܂�
+;; このevalコードは下記URLで公開の私の純LISPの仕様を再現します
 ;;  http://www.geocities.jp/takeiteasy_idontthinkso/mysoft/js_minimal_lisp/index.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; eval�̂��߂ɍ�������LAMBDA�֐��ꗗ
+;; evalのために今回作ったLAMBDA関数一覧
 
 ;; (EVAL func args)
 ;; (EVAL-R func args)
@@ -62,14 +62,14 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; eval      �ړI�̊֐� (���s���̂̊֐���exec)
+;; eval      目的の関数 (実行実体の関数はexec)
 
 (label eval (lambda (E A)
 	(result (exec (cons E A) (quote NIL)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; eval-r   ���s�̐��ۂƌ��ʂ��y�A�ɂ��ĕԂ�
+;; eval-r   実行の成否と結果をペアにして返す
 ;; 
 
 (label eval-r (lambda (E A)
@@ -83,7 +83,7 @@
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; program   ������LISP�R�[�h�����s���� (�ϐ����ێ����ĕ�����LISP�R�[�h�����s����)
+;; program   複数のLISPコードを実行する (変数を維持して複数のLISPコードを実行する)
 
 
 (label program (lambda (P V)
@@ -94,7 +94,7 @@
 		((quote T)
 			((lambda (R N)
 				(cond
-					((atom R) R) ;; ���s�G���[
+					((atom R) R) ;; 実行エラー
 					((atom N) (cond (N (result (exec N (cdr R)))) ((quote T) (car R))))
 					((quote T) (program N (cdr R)))
 				)
@@ -106,13 +106,13 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; result  exec�̖߂�l���猋�ʂ����o��
+;; result  execの戻り値から結果を取り出す
 
 (label result (lambda (R) (cond ((atom R) R) ((quote T) (car R)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; car cdr �����֐�
+;; car cdr 合成関数
 
 (label cdar (lambda (X) (cdr (car X))))
 (label caar (lambda (X) (car (car X))))
@@ -123,27 +123,27 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; if  ��������NIL�ȊO�Ȃ�������A��������NIL�Ȃ��O������Ԃ�
-;;     ��������NIL�ł����������]������邱�Ƃɒ���
-;;     ��������NIL�ȊO�ł���O�������]������邱�Ƃɒ���
+;; if  第一引数がNIL以外なら第二引数、第一引数がNILなら第三引数を返す
+;;     第一引数がNILでも第二引数が評価されることに注意
+;;     第一引数がNIL以外でも第三引数が評価されることに注意
 
 (label if (lambda (X Y Z) (cond (X Y) ((quote T) Z))))
 
-;;��
+;;例
 
 (if (quote A) (quote B) (quote C)) ;; B
 (if (quote NIL) (quote C) (quote D)) ;; D
 (if (quote K) (quote NIL) (quote T)) ;; NIL
-(if (quote NIL) (label A (quote B)) (quote R)) ;; R �������������s����Ă��邱�Ƃɒ��� [A�̒l��B�ɂȂ��Ă���]
-(if (quote T) (quote P) (label C (quote D))) ;; P ����O���������s����Ă��邱�Ƃɒ��� [C�̒l��D�ɂȂ��Ă���]
+(if (quote NIL) (label A (quote B)) (quote R)) ;; R ※第二引数が実行されていることに注意 [Aの値はBになっている]
+(if (quote T) (quote P) (label C (quote D))) ;; P ※第三引数が実行されていることに注意 [Cの値はDになっている]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; not  ������NIL�Ȃ�T�ANIL�ȊO�Ȃ�NIL��Ԃ�
+;; not  引数がNILならT、NIL以外ならNILを返す
 
 (label not (lambda (X) (cond (X (quote NIL)) ((quote T) (quote T)))))
 
-;;��
+;;例
 (not (quote T)) ;; NIL
 (not (quote NIL)) ;; T
 (not (cons (quote A) (quote B))) ;; NIL
@@ -151,43 +151,43 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; and ��������NIL�ȊO�Ȃ�������A��������NIL�Ȃ�NIL��Ԃ�
-;;     ��������NIL�ł����������]������邱�Ƃɒ���
+;; and 第一引数がNIL以外なら第二引数、第一引数がNILならNILを返す
+;;     第一引数がNILでも第二引数が評価されることに注意
 
 (label and (lambda (X Y) (cond (X Y) ((quote T) (quote NIL)))))
 
-;;��
+;;例
 
 (and (quote A) (quote B)) ;; B
 (and (quote NIL) (quote C)) ;; NIL
 (and (quote K) (quote NIL)) ;; NIL
-(and (quote NIL) (label A (quote B))) ;; NIL ���������͎��s����Ă��邱�Ƃɒ��� [A�̒l��B�ɂȂ��Ă���]
+(and (quote NIL) (label A (quote B))) ;; NIL ※第二引数は実行されていることに注意 [Aの値はBになっている]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; or ��������NIL�Ȃ�������A��������NIL�ȊO�Ȃ�T��Ԃ�
-;;     ��������NIL�ȊO�ł����������]������邱�Ƃɒ���
+;; or 第一引数がNILなら第二引数、第一引数がNIL以外ならTを返す
+;;     第一引数がNIL以外でも第二引数が評価されることに注意
 
 (label or (lambda (X Y) (cond (X (quote T)) ((quote T) Y))))
 
-;;��
+;;例
 
 (or (quote A) (quote B)) ;; T
 (or (quote NIL) (quote C)) ;; C
 (or (quote NIL) (quote NIL)) ;; NIL
-(or (quote K) (label A (quote C))) ;; K ���������͎��s����Ă��邱�Ƃɒ��� [A�̒l��C�ɂȂ��Ă���]
+(or (quote K) (label A (quote C))) ;; K ※第二引数は実行されていることに注意 [Aの値はCになっている]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; exist-s  �����������X�g�Ȃ烊�X�g���̗v�f�Ɏw��V���{���������T�A�Ȃ����NIL��Ԃ�
-;;          ���������V���{���Ȃ�EQ�Ɠ���
-;;          S�͒��ׂ�V���{���AL�̓��X�g���V���{��
-;;          S��NIL�AL�ɏ����X�g���w�肵���ꍇ�A�����X�g�̖�����NIL�����o����K��T�ƂȂ邱�Ƃɒ���
-;;          not �̒�`���K�v
+;; exist-s  第二引数がリストならリスト内の要素に指定シンボルがあればT、なければNILを返す
+;;          第二引数がシンボルならEQと同じ
+;;          Sは調べるシンボル、Lはリストかシンボル
+;;          SにNIL、Lに純リストを指定した場合、純リストの末尾のNILが検出され必ずTとなることに注意
+;;          not の定義が必要
 
 (label exist-s (lambda (S L)
 	(cond 
-		((not (atom S)) (quote NIL)) ;; S�����X�g�A
+		((not (atom S)) (quote NIL)) ;; Sがリスト、
 		((atom L) (eq S L))
 		((atom (car L))
 			(cond
@@ -195,23 +195,23 @@
 				((quote T) (exist-s S (cdr L)))))
 		((quote T) (exist-s S (cdr L))))))
 
-;;��
+;;例
 (exist-s (quote D) (quote (A B C D E F G))) ;; T
 (exist-s (quote D) (quote (A B C (D) E F G))) ;; NIL
 (exist-s (quote X) (quote (A B C D E F G))) ;; NIL
 (exist-s (quote D) (quote (A B C K E F G . D))) ;; T
 (exist-s (quote D) (quote D)) ;; T
-(exist-s (quote NIL) (quote (A B C D E F G))) ;; T �������X�g�̏ꍇ�A������NIL�����������
+(exist-s (quote NIL) (quote (A B C D E F G))) ;; T ※純リストの場合、末尾のNILが検索される
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; truelist �����X�g�Ȃ�T�A�����X�g����Ȃ��Ȃ�NIL��Ԃ�
+;; truelist 純リストならT、純リストじゃないならNILを返す
 
 (label truelist (lambda (L)
 	(cond ((atom L) (eq L (quote NIL))) ((quote T) (truelist (cdr L))))))
 	
-;;��
+;;例
 (truelist (quote (A B C D E F G))) ;; T
 (truelist (quote ABC)) ;; NIL
 (truelist (quote (A . B))) ;; NIL
@@ -219,15 +219,15 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; equal  �Q�̈����������Ȃ�T�A�Ⴄ�Ȃ�NIL��Ԃ��B���X�g���m�̔�r���ł���
-;;        not �� and �̒�`���K�v
+;; equal  ２つの引数が同じならT、違うならNILを返す。リスト同士の比較もできる
+;;        not と and の定義が必要
 
 (label equal (lambda (X Y)
 	(cond ((and (atom X) (atom Y)) (eq X Y))
 		((and (not (atom X)) (not (atom Y))) (and (equal (car X) (car Y)) (equal (cdr X) (cdr Y))))
 		((quote T) (quote NIL)))))
 
-;;��
+;;例
 (equal (quote A) (quote A)) ;; T
 (equal (quote A) (quote B)) ;; NIL
 (equal (quote (A)) (quote A)) ;; NIL
@@ -239,7 +239,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; symbollist  ���X�g�̗v�f���A�g�������Ȃ�T�A�������̓A�g����󃊃X�g��T�A����ȊO��NIL
+;; symbollist  リストの要素がアトムだけならT、もしくはアトムや空リストもT、それ以外はNIL
 
 (label symbollist (lambda (X) 
 	(cond 
@@ -248,7 +248,7 @@
 		((quote T) (quote NIL))
 	)))
 
-;;��
+;;例
 (symbollist (quote (A B C D E F))) ;; T
 (symbollist (quote (A . B))) ;; T
 (symbollist (quote NIL)) ;; T
@@ -257,7 +257,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; islist      ���������X�g���󃊃X�g��������T�ANIL�ȊO�̃A�g���Ȃ�NIL
+;; islist      引数がリストか空リストだったらT、NIL以外のアトムならNIL
 
 (label islist (lambda (X)
 	(cond 
@@ -272,74 +272,74 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; findvar   �ϐ����X�g�Ɏw�薼�̕ϐ��������T�A�������NIL��Ԃ�
-;;           not if cdar �̒�`���K�v
+;; findvar   変数リストに指定名の変数があればT、無ければNILを返す
+;;           not if cdar の定義が必要
 
 (label findvar (lambda (V S)
 	(cond
 		((not (atom s)) (quote ERROR))
-		((atom V) (if (eq V (quote NIL)) (quote NIL) (quote ERROR))) ;; V���󃊃X�g�Ȃ�NIL�AV�������̃A�g���Ȃ�ERROR
+		((atom V) (if (eq V (quote NIL)) (quote NIL) (quote ERROR))) ;; Vが空リストならNIL、VがただのアトムならERROR
 		((quote T)
 			(cond
-				((atom (car V)) (quote ERROR)) ;; �ϐ��̑΂ɂȂ��Ă��Ȃ��̂�ERROR�Ƃ��Č����𒆒f����
+				((atom (car V)) (quote ERROR)) ;; 変数の対になっていないのでERRORとして検索を中断する
 				((quote T)
 					(cond
 						((atom (cdar V))
 							(cond
-								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; ��d����
-								((eq (cdar V) S) (quote T)) ;; �ϐ�����������
+								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; 二重括弧
+								((eq (cdar V) S) (quote T)) ;; 変数が見つかった
 								((quote T) (findvar (cdr V) S))))
-						((quote T) (quote ERROR)) ;; �ϐ����̕��������X�g�ɂȂ��Ă�̂�ERROR�Ƃ��Č����𒆒f����
+						((quote T) (quote ERROR)) ;; 変数名の部分がリストになってるのでERRORとして検索を中断する
 					)))))))
 
-;;��
+;;例
 (findvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote B)) ;; T 
 (findvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote A)) ;; NIL
 (findvar (quote ((a . b) a (a . e) (e . f))) (quote A)) ;; ERROR
 (findvar (quote ((a . b) (c . (a)) (a . e) (e . f))) (quote A)) ;; ERROR
-(findvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ���\��L�[���[�h�ł̌����͋֎~���Ă��Ȃ�
+(findvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ※予約キーワードでの検索は禁止していない
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; getvar   �ϐ����X�g�Ɏw�薼�̕ϐ�������ΑΉ�����l�A�������ERROR��Ԃ�
-;;           not or if cdar caar �̒�`���K�v
+;; getvar   変数リストに指定名の変数があれば対応する値、無ければERRORを返す
+;;           not or if cdar caar の定義が必要
 
 (label getvar (lambda (V S)
 	(cond
-		((or (not (atom S)) (atom V)) (quote ERROR)) ;; V���A�g����󃊃X�g�AS���V���{���łȂ��A�Ȃ�G���[
+		((or (not (atom S)) (atom V)) (quote ERROR)) ;; Vがアトムや空リスト、Sがシンボルでない、ならエラー
 		((quote T)
 			(cond
-				((atom (car V)) (quote ERROR)) ;; �ϐ��̑΂ɂȂ��Ă��Ȃ��̂�ERROR�Ƃ��Č����𒆒f����
+				((atom (car V)) (quote ERROR)) ;; 変数の対になっていないのでERRORとして検索を中断する
 				((quote T)
 					(cond
 						((atom (cdar V))
 							(cond
-								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; ��d����
-								((eq (cdar V) S) (caar V)) ;; �ϐ�����������
+								((eq (cdar V) (quote NIL)) (quote ERROR)) ;; 二重括弧
+								((eq (cdar V) S) (caar V)) ;; 変数が見つかった
 								((quote T) (getvar (cdr V) S))))
-						((quote T) (quote ERROR)) ;; �ϐ����̕��������X�g�ɂȂ��Ă�̂�ERROR�Ƃ��Č����𒆒f����
+						((quote T) (quote ERROR)) ;; 変数名の部分がリストになってるのでERRORとして検索を中断する
 					)))))))
 
-;;��
+;;例
 (getvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote B)) ;; A
 (getvar (quote ((a . b) (c . d) (a . e) (e . f))) (quote A)) ;; ERROR
 (getvar (quote ((a . b) a (a . e) (e . f))) (quote A)) ;; ERROR
 (getvar (quote ((a . b) (c . (a)) (a . e) (e . f))) (quote A)) ;; ERROR
-(getvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ���\��L�[���[�h�ł̌����͋֎~���Ă��Ȃ�
+(getvar (quote ((a . b) (c . d) ((a . e)) (e . f))) (quote NIL)) ;; ERROR ※予約キーワードでの検索は禁止していない
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; addvar   �ϐ����X�g�ւ̕ϐ��̒ǉ�
-;;			or not truelist exist-s �̒�`���K�v
+;; addvar   変数リストへの変数の追加
+;;			or not truelist exist-s の定義が必要
 
 (label addvar (lambda (V S D)
 	(cond 
-		((or (not (truelist V)) (not (atom S))) (quote ERROR)) ;; V�������X�g�łȂ��AS���V���{���łȂ��ꍇ�̓G���[
-		((exist-s S (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (quote ERROR)) ;; �ϐ����ɗ\��L�[���[�h���g�p���悤�Ƃ���ƃG���[
-		((quote T) (cons (cons D S) V)) ;; �l��ǉ������ϐ����X�g��Ԃ�
+		((or (not (truelist V)) (not (atom S))) (quote ERROR)) ;; Vが純リストでない、Sがシンボルでない場合はエラー
+		((exist-s S (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (quote ERROR)) ;; 変数名に予約キーワードを使用しようとするとエラー
+		((quote T) (cons (cons D S) V)) ;; 値を追加した変数リストを返す
 	)))
 
-;;��
+;;例
 
 (addvar (quote NIL) (quote A) (quote HOGE)) ;; ((HOGE . A))
 (addvar (quote ((HOGE . A))) (quote B) (quote UNKO)) ;; ((UNKO . B) (HOGE . A))
@@ -348,9 +348,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; exec      �]�����ׂ����i�l�j��]������
-;;           C�ɂ͕]�����ׂ����i�l�j�AV�ɂ͕ϐ����X�g
-;;           exec-atom exec-list �̒�`���K�v
+;; exec      評価すべき式（値）を評価する
+;;           Cには評価すべき式（値）、Vには変数リスト
+;;           exec-atom exec-list の定義が必要
 
 (label exec (lambda (C V)
 	(cond
@@ -361,31 +361,31 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; exec-atom  �]�����ׂ��A�g��(�l)��]������
-;;            not findvar getvar exist-s islist �̒�`���K�v
+;; exec-atom  評価すべきアトム(値)を評価する
+;;            not findvar getvar exist-s islist の定義が必要
 
 
 (label exec-atom (lambda (C V)
 	(cond 
 		((not (islist V)) (quote ERROR))
-		((not (atom C)) (quote ERROR))	;; �C���M�����[�ȌĂяo��
+		((not (atom C)) (quote ERROR))	;; イレギュラーな呼び出し
 		((quote T)
 			(cond
-				((exist-s C (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (cons C V)) ;;�\��L�[���[�h
-				((eq (findvar V C) (quote T)) (cons (getvar V C) V)) ;; �ϐ�
-				((quote T) (quote ERROR)) ;; ���݂��Ȃ��l
+				((exist-s C (quote (ATOM EQ CONS CAR CDR COND QUOTE LABEL LAMBDA NIL T))) (cons C V)) ;;予約キーワード
+				((eq (findvar V C) (quote T)) (cons (getvar V C) V)) ;; 変数
+				((quote T) (quote ERROR)) ;; 存在しない値
 			)))))
 			
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; exec-list   �]�����ׂ����X�g����������
-;;             caar cdar cadarcddar caddar cdddar truelist �̒�`���K�v
-;;             do-quote def-lambda �̒�`���K�v
+;; exec-list   評価すべきリストを処理する
+;;             caar cdar cadarcddar caddar cdddar truelist の定義が必要
+;;             do-quote def-lambda の定義が必要
 
 (label exec-list (lambda (E A)
 	(cond
 		((not (truelist A)) (quote ERROR))
-		((atom E) (quote ERROR)) ;;�C���M�����[�ȌĂяo��
+		((atom E) (quote ERROR)) ;;イレギュラーな呼び出し
 		((atom (car E))
 			(cond 
 				((eq (car E) (quote EQ)) (do-eq A (cdr E)))
@@ -397,18 +397,18 @@
 				((eq (car E) (quote QUOTE)) (do-quote A (cdr E)))
 				((eq (car E) (quote LABEL)) (do-label A (cdr E)))
 				((eq (car E) (quote LAMBDA)) (def-lambda A (cdr E)))
-				((quote T) (quote ERROR)))) ;; �V�X�e���֐��łȂ����̂��Ăяo��
+				((quote T) (quote ERROR)))) ;; システム関数でないものを呼び出し
 		((atom (caar E))
 			(cond
 				((eq (caar E) (quote LAMBDA))
 					(cond
-						((atom (cdar E)) (quote ERROR)) ;;�v�f���(LAMBDA)�݂̂̃��X�g
-						((atom (cddar E)) (quote ERROR)) ;; �v�f��݂̂̃��X�g(�����_���X�g���{�f�B�������Ă�)
-						((cdddar E) (quote ERROR)) ;; �v�f���S�ȏ�̃��X�g
+						((atom (cdar E)) (quote ERROR)) ;;要素一つ(LAMBDA)のみのリスト
+						((atom (cddar E)) (quote ERROR)) ;; 要素二つのみのリスト(ラムダリストかボディが抜けてる)
+						((cdddar E) (quote ERROR)) ;; 要素が４つ以上のリスト
 						((quote T) (do-lambda-func (cadar E) (caddar E) (make-arg-list A (cdr E))))
 					))
-				((quote T) (quote ERROR)))) ;;LAMBDA�֐��ł��Ȃ��䃊�X�g�̌Ăяo��
-		((quote T) (quote ERROR)) ;;�䃊�X�g�̌Ăяo��
+				((quote T) (quote ERROR)))) ;;LAMBDA関数でもない謎リストの呼び出し
+		((quote T) (quote ERROR)) ;;謎リストの呼び出し
 	)))
 			
 
@@ -416,39 +416,39 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-quote
-;;           QUOTE ����`��
+;;           QUOTE 特殊形式
 
 (label do-quote (lambda (A V)
 	(cond
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((cdr A) (quote ERROR)) ;; �������X�g�̗v�f���Q�ȏ� (�Ō�̗v�f�ł���͂��Ȃ̂ɂ�NIL�ɂȂ��ĂȂ�)
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数リストの要素が２つ以上 (最後の要素であるはずなのにがNILになってない)
 		((quote T) (cons (car A) V)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; def-lambda
-;;           LAMBDA ����`�� (LAMBDA�֐��̒�`)
-;;           not islist symollist �̒�`���K�v
+;;           LAMBDA 特殊形式 (LAMBDA関数の定義)
+;;           not islist symollist の定義が必要
 
 (label def-lambda (lambda (A V)
 	(cond
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((atom (cdr A)) (quote ERROR)) ;; �����̗v�f���P�����Ȃ�
-		((cddr A) (quote ERROR)) ;; �����̗v�f���R�ȏ� (�Ō�̗v�f�ł���͂��Ȃ̂ɂ�NIL�ɂȂ��ĂȂ�)
-		((not (symbollist (car A))) (quote ERROR)) ;; �����_���X�g���V���{���݂̂̃��X�g�łȂ�
-		((quote T) (cons (cons (quote LAMBDA) A) V)) ;; �����_�̒�`�������̂܂ܕԂ�
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((not (symbollist (car A))) (quote ERROR)) ;; ラムダリストがシンボルのみのリストでない
+		((quote T) (cons (cons (quote LAMBDA) A) V)) ;; ラムダの定義式をそのまま返す
 	)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-atom
-;;          ATOM �V�X�e���֐�
-;;          exec �̒�`���K�v
+;;          ATOM システム関数
+;;          exec の定義が必要
 
 (label do-atom (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; �������X�g�����X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((cdr A) (quote ERROR)) ;; �����̗v�f���Q�ȏ�
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
 		((quote T)
 			((lambda (R) 
 				(cond
@@ -461,13 +461,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-car
-;;         CAR �V�X�e���֐�
-;;         exec islist �̒�`���K�v
+;;         CAR システム関数
+;;         exec islist の定義が必要
 
 (label do-car (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; �������X�g�����X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((cdr A) (quote ERROR)) ;; �����̗v�f���Q�ȏ�
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
 		((quote T)
 			((lambda (R) 
 				(cond
@@ -481,13 +481,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-cdr
-;;         CDR �V�X�e���֐�
-;;         exec islist �̒�`���K�v
+;;         CDR システム関数
+;;         exec islist の定義が必要
 
 (label do-cdr (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; �������X�g�����X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((cdr A) (quote ERROR)) ;; �����̗v�f���Q�ȏ�
+		((atom A) (quote ERROR)) ;; 引数リストがリストになってない、もしくは空リスト
+		((cdr A) (quote ERROR)) ;; 引数の要素が２つ以上
 		((quote T)
 			((lambda (R) 
 				(cond
@@ -501,23 +501,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-cons
-;;          CONS �V�X�e���֐�
-;;          cddr cadr �̒�`���K�v
-;;          exec �̒�`���K�v
+;;          CONS システム関数
+;;          cddr cadr の定義が必要
+;;          exec の定義が必要
 
 (label do-cons (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((atom (cdr A)) (quote ERROR)) ;; �����̗v�f���P�����Ȃ�
-		((cddr A) (quote ERROR)) ;; �����̗v�f���R�ȏ� (�Ō�̗v�f�ł���͂��Ȃ̂ɂ�NIL�ɂȂ��ĂȂ�)
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
 		((quote T)
 			((lambda (ER1 R2)
 				(cond 
-					((atom  ER1) ER1) ;; ���������G���[
+					((atom  ER1) ER1) ;; 第一引数がエラー
 					((quote T)
 						((lambda (R1 ER2)
 							(cond
-								((atom ER2) ER2) ;; ���������G���[
+								((atom ER2) ER2) ;; 第二引数がエラー
 								((quote T)
 									(cons (CONS R1 (car ER2)) (cdr ER2)))
 							))
@@ -529,23 +529,23 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-eq
-;;          EQ �V�X�e���֐�
-;;          cddr cadr �̒�`���K�v
-;;          exec �̒�`���K�v
+;;          EQ システム関数
+;;          cddr cadr の定義が必要
+;;          exec の定義が必要
 
 (label do-eq (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((atom (cdr A)) (quote ERROR)) ;; �����̗v�f���P�����Ȃ�
-		((cddr A) (quote ERROR)) ;; �����̗v�f���R�ȏ� (�Ō�̗v�f�ł���͂��Ȃ̂ɂ�NIL�ɂȂ��ĂȂ�)
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
 		((quote T)
 			((lambda (ER1 R2)
 				(cond 
-					((atom  ER1) ER1) ;; ���������G���[
+					((atom  ER1) ER1) ;; 第一引数がエラー
 					((quote T)
 						((lambda (R1 ER2)
 							(cond
-								((atom ER2) ER2) ;; ���������G���[
+								((atom ER2) ER2) ;; 第二引数がエラー
 								((quote T)
 									(cond
 										((and (atom R1) (atom (car ER2)))
@@ -562,24 +562,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-label
-;;          LABEL ����`��
-;;          cddr cadr islist addvar �̒�`���K�v
-;;          exec �̒�`���K�v
+;;          LABEL 特殊形式
+;;          cddr cadr islist addvar の定義が必要
+;;          exec の定義が必要
 
 (label do-label (lambda (A V)
 	(cond 
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((atom (cdr A)) (quote ERROR)) ;; �����̗v�f���P�����Ȃ�
-		((cddr A) (quote ERROR)) ;; �����̗v�f���R�ȏ� (�Ō�̗v�f�ł���͂��Ȃ̂ɂ�NIL�ɂȂ��ĂȂ�)
-		((islist (car A)) (quote ERROR)) ;; ���������V���{���ɂȂ��ĂȂ�
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (cdr A)) (quote ERROR)) ;; 引数の要素が１つしかない
+		((cddr A) (quote ERROR)) ;; 引数の要素が３つ以上 (最後の要素であるはずなのにがNILになってない)
+		((islist (car A)) (quote ERROR)) ;; 第一引数がシンボルになってない
 		((quote T)
 			((lambda (S D)
 				(cond 
-					((atom D) D) ;;���������G���[
+					((atom D) D) ;;第二引数がエラー
 					((quote T)
 						((lambda (R L)
 							(cond 
-								((atom L) L) ;; �����ǉ��G���[
+								((atom L) L) ;; 引数追加エラー
 								((quote T) (cons R L))))
 						(car D) (addvar (cdr D) S (car D)))
 					)
@@ -592,22 +592,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; do-cond
-;;          COND ����`��
-;;          caar cdar cddar cadar �̒�`���K�v
-;;          exec �̒�`���K�v
+;;          COND 特殊形式
+;;          caar cdar cddar cadar の定義が必要
+;;          exec の定義が必要
 
 (label do-cond (lambda (A V)
 	(cond
-		((atom A) (quote ERROR)) ;; ���������X�g�ɂȂ��ĂȂ��A�������͋󃊃X�g
-		((atom (car A)) (quote ERROR)) ;; ���������A�g���A�������͋󃊃X�g
-		((atom (cdar A)) (quote ERROR)) ;;�������̗v�f���P�����Ȃ�
-		((cddar A) (quote ERROR)) ;; �������̗v�f���R�ȏ�
+		((atom A) (quote ERROR)) ;; 引数がリストになってない、もしくは空リスト
+		((atom (car A)) (quote ERROR)) ;; 第一引数がアトム、もしくは空リスト
+		((atom (cdar A)) (quote ERROR)) ;;第一引数の要素が１つしかない
+		((cddar A) (quote ERROR)) ;; 第一引数の要素が３つ以上
 		((quote T)
 			((lambda (H P N)
 				(cond
-					((atom H) H) ;; �������̕]�����G���[
-					((car H) (exec P (cdr H))) ;; �������̕]���������Ȃ�΂̒l��Ԃ�
-					((quote T) (do-cond N (cdr H))) ;; �������֏���������
+					((atom H) H) ;; 第一引数の評価がエラー
+					((car H) (exec P (cdr H))) ;; 第一引数の評価が成功なら対の値を返す
+					((quote T) (do-cond N (cdr H))) ;; 第二引数へ処理をうつす
 				))
 			(exec (caar A) V) (cadar A) (cdr A)))
 	)))
@@ -615,22 +615,22 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; make-arg-list   LAMBDA�֐��Ăяo���̈������X�g�����
-;;                 �߂�l�͕]����������X�g�ƕϐ����X�g�̃y�A
-;;                 islist exec �̒�`���K�v
+;; make-arg-list   LAMBDA関数呼び出しの引数リストを作る
+;;                 戻り値は評価後引数リストと変数リストのペア
+;;                 islist exec の定義が必要
 
 (label make-arg-list (lambda (A V) 
 	(cond
-		((not (islist A)) (quote ERROR)) ;; ���X�g�̖�����NIL�ȊO�̃A�g��
-		((atom A) (cons A V)) ;; ���X�g�̖��� NIL�̂͂�
+		((not (islist A)) (quote ERROR)) ;; リストの末尾がNIL以外のアトム
+		((atom A) (cons A V)) ;; リストの末尾 NILのはず
 		((quote T)
 			((lambda (D R)
 				(cond
-					((atom D) D) ;; D�̓G���[
+					((atom D) D) ;; Dはエラー
 					((quote T)
 						((lambda (P Q)
 							(cond 
-								((atom Q) Q) ;; �ċA�ŃG���[
+								((atom Q) Q) ;; 再帰でエラー
 								((quote T) (cons (cons P (car Q)) (cdr Q)))
 							))
 						(car D) (make-arg-list R (cdr D))))
@@ -640,48 +640,48 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; set-lambda-args    LAMBDA�֐��̉������Ǝ����������ѕt����
-;;                    equal islist not addvar if �̒�`���K�v
+;; set-lambda-args    LAMBDA関数の仮引数と実引数を結び付ける
+;;                    equal islist not addvar if の定義が必要
 
 (label set-lambda-args (lambda (D A V)
 	(cond 
-		((equal D (quote NIL)) (if (equal A (quote NIL)) V (quote ERROR))) ;;�����_���X�g�̖���
-		((atom D) (addvar V D A)) ;;A�̎c��S����o�^
+		((equal D (quote NIL)) (if (equal A (quote NIL)) V (quote ERROR))) ;;ラムダリストの末尾
+		((atom D) (addvar V D A)) ;;Aの残り全部を登録
 		((atom (car D))
 			(cond
 				((atom A) (quote ERROR))
 				((quote T) 
 					((lambda (DD AA R)
 						(cond
-							((not (islist R)) (quote ERROR)) ;;�ϐ��ݒ�G���[(�����炭�\��L�[���[�h)
+							((not (islist R)) (quote ERROR)) ;;変数設定エラー(おそらく予約キーワード)
 							((quote T) (set-lambda-args DD AA R))
 						))
 					(cdr D) (cdr A) (addvar V (car D) (car A))))
 			))
-		((quote T) (quote ERROR)) ;; �����_���X�g���V���{������Ȃ�
+		((quote T) (quote ERROR)) ;; ラムダリストがシンボルじゃない
 	)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; do-lambda-func LAMBDA�֐��̎��s��S��
+;; do-lambda-func LAMBDA関数の実行を担う
 
 
 (label do-lambda-func (lambda (D B AV)
 	(cond
-		((atom AV) AV) ;; �������X�g�̐������s�H
-		((not (truelist (car AV))) (quote ERROR)) ;; �]����������X�g�������X�g�ɂȂ��ĂȂ�
-		((not (truelist (cdr AV))) (quote ERROR)) ;; �ϐ����X�g�������X�g�ɂȂ��ĂȂ�
-		((not (symbollist D)) (quote ERROR)) ;; �����_���X�g���V���{�����X�g�ɂȂ��ĂȂ�
+		((atom AV) AV) ;; 引数リストの生成失敗？
+		((not (truelist (car AV))) (quote ERROR)) ;; 評価後引数リストが純リストになってない
+		((not (truelist (cdr AV))) (quote ERROR)) ;; 変数リストが純リストになってない
+		((not (symbollist D)) (quote ERROR)) ;; ラムダリストがシンボルリストになってない
 		((quote T)
 			((lambda (P A V)
 				(cond
-					((atom A) A) ;;�����R���G���[
+					((atom A) A) ;;引数紐つけエラー
 					((quote T)
 						((lambda (R O)
 							(cond
-								((atom R) R) ;; �֐����s�G���[
-								((quote T) (cons (car R) O)) ;; �O�̕ϐ����X�g�Ŗ߂�l��Ԃ�
+								((atom R) R) ;; 関数実行エラー
+								((quote T) (cons (car R) O)) ;; 前の変数リストで戻り値を返す
 							))
 						(exec P A) V))
 				))
@@ -690,52 +690,52 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;�e�X�g�R�[�h�P
+;;テストコード１
 
-;;������LISP�R�[�h�����s����
+;;複数のLISPコードを実行する
 
 (program (quote (
 
 (label a (quote ABC))
 (label b (quote (EFG HIJ)))
 (label b (cons a b))
-(cons a b) ;; �Ō��LISP�R�[�h�̌��ʂ��\������� ���ʂ�(ABC ABC EFG HIJ)�ƂȂ�
+(cons a b) ;; 最後のLISPコードの結果が表示される 結果は(ABC ABC EFG HIJ)となる
 
 )) (quote NIL))
 
 ;;
-;;  eval���eval�H
+;;  eval上でeval？
 ;;
-;;  lisp15.txt�̓��e���e�L�X�g�G���A�ɃR�s�y���Ď��s�������Ƃ�
-;;  �ȉ��̂悤�ȃR�[�h����͂��Ď��s���邱�Ƃ� eval���eval�������ł��܂�(�`���[�����O���S�Ȃ̂ŉ\�Ȃ̂ł��I)
-;;  (�S������100�{�ȏ�̎��Ԃ�������̂Œ��ӁA�������{�ȏ�ɏd��lisp14.txt�ł̓e�X�g���Ȃ��ق�������ł�)
+;;  lisp15.txtの内容をテキストエリアにコピペして実行したあとで
+;;  以下のようなコードを入力して実行することで eval上にevalを実現できます(チューリング完全なので可能なのです！)
+;;  (全処理に100倍以上の時間がかかるので注意、処理が倍以上に重いlisp14.txtではテストしないほうが無難です)
 ;;  
 ;;  (program (quote (
 ;;  
-;;    ;;���̈ʒu��lisp15.txt�̓��e���ہX�R�s�y
+;;    ;;この位置にlisp15.txtの内容を丸々コピペ
 ;;  
 ;;  )) (quote NIL))
 ;;
-;;  ���Q�l (lisp15.txt�Ńe�X�g)
-;;  ���̃l�b�g�u�b�N(CPU1.66GHz, ������1GB, Windows7 Starter SP1)�Ńu���E�UOpera(12.15)��Ŏ��s��������
-;;    lisp15.txt�̓��e���e�L�X�g�G���A�ɃR�s�y���Ď��s �c ���b���x
-;;    ��L���s�� program�֐���lisp15.txt�̓��e��n���Ď��s �c 5�`6��
+;;  ◆参考 (lisp15.txtでテスト)
+;;  私のネットブック(CPU1.66GHz, メモリ1GB, Windows7 Starter SP1)でブラウザOpera(12.15)上で実行した結果
+;;    lisp15.txtの内容をテキストエリアにコピペして実行 … 数秒程度
+;;    上記実行後 program関数にlisp15.txtの内容を渡して実行 … 5～6分
 ;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;�e�X�g�R�[�h�Q
+;;テストコード２
 
-;; (SUBST replace symbol value)  value����symbol��replace�ɒu��������
-;; ����eval��
+;; (SUBST replace symbol value)  value内のsymbolをreplaceに置き換える
+;; このevalは
 ;; (label SUBST (lambda (x y z) (cond ((atom z) (cond ((eq y z) x) ((quote t) z))) ((quote t) (cons (subst x y (car z)) (subst x y (cdr z)))))))
-;; (SUBST (quote (X Y)) (quote B) (quote (A (B C) A B C))) �����s����
-;; ���ʂ� (A ((X Y) C) A (X Y) C) �ƂȂ�
+;; (SUBST (quote (X Y)) (quote B) (quote (A (B C) A B C))) を実行する
+;; 結果は (A ((X Y) C) A (X Y) C) となる
 
 (EVAL (quote (LABEL SUBST (LAMBDA (X Y Z) (COND ((ATOM Z) (COND ((EQ Y Z) X) ((quote T) Z))) 
  ((quote T) (CONS (SUBST X Y (CAR Z)) (SUBST X Y (CDR Z)))))))) 
  (quote ((quote (X Y)) (quote B) (quote (A (B C) A B C)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ���̃e�L�X�g�t�@�C���̏I���
+;; このテキストファイルの終わり
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

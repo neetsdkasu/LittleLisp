@@ -1,13 +1,13 @@
-ƒlisp ‚Åeval‚ğl‚¦‚é
+ç´”lisp ã§evalã‚’è€ƒãˆã‚‹
 
-—á
+ä¾‹
 LISP> (eval '(cons 'a 'b))
 (A . B)
 
 LISP> (eval '(cons (car '((a b c) d)) (cdr '(x (y z)))))
 ((A B C) (Y Z))
 
-‚±‚ñ‚ÈŠ´‚¶‚¾‚Æv‚í‚ê
+ã“ã‚“ãªæ„Ÿã˜ã ã¨æ€ã‚ã‚Œ
 
 
 

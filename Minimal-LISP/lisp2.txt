@@ -1,54 +1,54 @@
 
-ƒŠƒXƒg (a . b) ((a . b) . c) (a . (a . b)) etc.
-ƒVƒ“ƒ{ƒ‹ ƒŠƒXƒgˆÈŠO e.g. a abc 123 + a23 3sa
+ãƒªã‚¹ãƒˆ (a . b) ((a . b) . c) (a . (a . b)) etc.
+ã‚·ãƒ³ãƒœãƒ« ãƒªã‚¹ãƒˆä»¥å¤– e.g. a abc 123 + a23 3sa
 
-^ T
-‹U nil
+çœŸ T
+å½ nil
 
-ƒŠƒXƒg‚Ì—ªŽ®•\‹L
-—ªŽ®@@@³Ž®
-(a)@-> (a . nil)
+ãƒªã‚¹ãƒˆã®ç•¥å¼è¡¨è¨˜
+ç•¥å¼ã€€ã€€ã€€æ­£å¼
+(a)ã€€-> (a . nil)
 (a b) -> (a . (b . nil))
 (a b c) -> (a . (b . (c . nil)))
 (a b c d) -> (a . (b . (c . (d . nil))))
 (a b . c) -> (a . (b . c))
 
 
-ŠÖ” atom ƒŠƒXƒg‚È‚çnilAƒŠƒXƒgˆÈŠO‚ÍT
+é–¢æ•° atom ãƒªã‚¹ãƒˆãªã‚‰nilã€ãƒªã‚¹ãƒˆä»¥å¤–ã¯T
 (atom a) / (atom . (a . nil)) -> T
 (atom (a . b)) / (atom . ((a . b) . nil)) -> nil
 
-ŠÖ” eq ‚Q‚Â‚Ìˆø”(ƒVƒ“ƒ{ƒ‹)‚ª“¯‚¶‚È‚çTAˆá‚¤‚È‚çF
+é–¢æ•° eq ï¼’ã¤ã®å¼•æ•°(ã‚·ãƒ³ãƒœãƒ«)ãŒåŒã˜ãªã‚‰Tã€é•ã†ãªã‚‰F
 (eq a a) / (eq . (a . (a . nil))) -> T
 (eq a b) / (eq . (a . (b . nil))) -> nil
 (eq a (a . b)) / (eq . (a  . ((a . b) . nil))) -> ? undefined
 
-ŠÖ” car ƒŠƒXƒg‚Ì¶‘¤‚Ì—v‘f‚ð•Ô‚·
+é–¢æ•° car ãƒªã‚¹ãƒˆã®å·¦å´ã®è¦ç´ ã‚’è¿”ã™
 (car (a . b)) / (car . ((a . b) . nil)) -> a
 (car ((a . b) . c))  / (car . (((a . b) . c) . nil)) -> (a . b)
 (car a) / (car . (a . nil)) -> ? undefined
 
-ŠÖ” cdr ƒŠƒXƒg‚ÌÅŒã‚Ì—v‘f‚ð•Ô‚·
+é–¢æ•° cdr ãƒªã‚¹ãƒˆã®æœ€å¾Œã®è¦ç´ ã‚’è¿”ã™
 (cdr (a . b)) / (cdr . ((a . b) . nil)) -> b
 (cdr ((a . b) . c)) / (cdr . (((a . b) . c) . nil)) -> c
 (cdr a) / (cdr . (a . nil)) -> ? undefined
 
-ŠÖ” cons ‚Q‚Â‚Ì’l‚©‚çƒŠƒXƒg‚ðì‚é
+é–¢æ•° cons ï¼’ã¤ã®å€¤ã‹ã‚‰ãƒªã‚¹ãƒˆã‚’ä½œã‚‹
 (cons a b) / (cons . (a . (b . nil))) -> (a . b)
 (cons (a . b) c) (cons . ((a . b) . (c . nil)))  -> ((a . b) . c)
 
-“Á•ÊŽ® quote 
+ç‰¹åˆ¥å¼ quote 
 (quote a) / (quote . (a . nil)) -> a
 (quote (a . b)) / (quote . ((a . b) . nil)) -> (a . b)
 
-“Á•ÊŽ® cond
+ç‰¹åˆ¥å¼ cond
 (cond (a b))
 (cond (a b) (c d))
 
-“Á•ÊŽ® lambda
+ç‰¹åˆ¥å¼ lambda
 (lambda (a b) c)
 
-“Á•ÊŽ® label
+ç‰¹åˆ¥å¼ label
 (label a b)
 
 
@@ -60,7 +60,7 @@
 (cond (T 1) (nil 2) (T 3)) -> 1
 (cond (nil 1) (nil 2) (nil 3)) -> nil
 
-(lambda (x) x) -> Žè‘±‚«
+(lambda (x) x) -> æ‰‹ç¶šã
 
 
 ((lambda (x y . z) z) 3 4 5 6) -> (5 6)
