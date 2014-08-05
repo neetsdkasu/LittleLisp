@@ -1,15 +1,15 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <!--
-      SukunaLISP                 ����LISP
+      SukunaLISP                 少なLISP
 
         FileTitle       lisp8.html
         LastUpdate      2013/06.26
-        Version         ������  1.3.0  (����HTML�t�@�C����Version)
-        Autoher         ���ꂨ�� (takeiteasy_idontthinkso)
+        Version         整理版  1.3.0  (このHTMLファイルのVersion)
+        Autoher         おれおれ (takeiteasy_idontthinkso)
 -->
-<title>����LISP (SukunaLISP)</title>
+<title>少なLISP (SukunaLISP)</title>
 <style><!--
 TH { font-size:x-small }
 TD { font-size:x-small }
@@ -54,134 +54,134 @@ function showDebug() {
 <body>
 <!-- ************************************************************************************** -->
 
-<h3>����LISP (SukunaLISP)</h3>
-<div class="b">�������E�J���r��(2013/06/27)</div>
-<div><a href="lisp8.js">�\�[�X�t�@�C��(������(����LISP)Version 1.3.1 lisp8.js)</a>(<a href="lisp8.txt">txt</a>)</div>
-<div class="a"><a href="lisp13.js">�\�[�X�t�@�C��(�V��`��(��LISP)Version 2.1.1 lisp13.js)</a>(<a href="lisp13.txt">txt</a>)(<a href="index.html">����</a>)</div>
-<div class="a"><a href="lisp3.js">�\�[�X�t�@�C��(�v���g�^�C�v lisp3.js)</a>(<a href="lisp3.txt">txt</a>)</div>
+<h3>少なLISP (SukunaLISP)</h3>
+<div class="b">未完成・開発途中(2013/06/27)</div>
+<div><a href="lisp8.js">ソースファイル(整理版(少なLISP)Version 1.3.1 lisp8.js)</a>(<a href="lisp8.txt">txt</a>)</div>
+<div class="a"><a href="lisp13.js">ソースファイル(新定義版(純LISP)Version 2.1.1 lisp13.js)</a>(<a href="lisp13.txt">txt</a>)(<a href="index.html">実装</a>)</div>
+<div class="a"><a href="lisp3.js">ソースファイル(プロトタイプ lisp3.js)</a>(<a href="lisp3.txt">txt</a>)</div>
 <div class="a">
-�� �V��`��(lisp13.js)�ɂ���<br>
-�@�@�@�@�`���[�����O���S�̍Č�(LISP�R�[�h�ɂ��eval����)�����₷���悤�Ɏd�l��啝�ύX����<br>
-�@�@�@�@����ɂƂ��Ȃ�lisp8.js�́w��LISP�x���߁w����LISP�x�Ƃ������̂ɕύX����<br>
-�� �v���g�^�C�v(lisp3.js)�Ɛ�����(lisp8.js)�̈Ⴂ�ɂ���<br>
-�@�@�@�@�������̊֐����̕ύX�ƁA�֐����ЂƂ܂Ƃ߂ɂ���<br>
-�@�@�@�@�܂�LISP�R�[�h��͂̕��@���ۂ��ƕύX�����i�����s�ւ̕����L�q�E�R�����g�s(;)�ɑΉ��j
+※ 新定義版(lisp13.js)について<br>
+　　　　チューリング完全の再現(LISPコードによるeval実現)をしやすいように仕様を大幅変更した<br>
+　　　　それにともないlisp8.jsは『純LISP』改め『少なLISP』という名称に変更した<br>
+※ プロトタイプ(lisp3.js)と整理版(lisp8.js)の違いについて<br>
+　　　　いくつかの関数名の変更と、関数をひとまとめにした<br>
+　　　　またLISPコード解析の方法を丸ごと変更した（複数行への分割記述・コメント行(;)に対応）
 </div>
 <hr>
 <div class="a">
-<a href="lisp14.txt">�}�C�I���W�i��eval�R�[�h(lisp14.txt)</a> (2013/06/26 Version 1.2.0)<br>
-���̃e�L�X�g�t�@�C���̒��g���ۂ��ƑS���A���̃e�L�X�g�G���A�ɃR�s�y���Ď��s����Ύ����܂�<br>
-���̃R�[�h�͏�LISP�p�̏�LISP�d�leval�ł����A���́w����LISP�x�ł����삵�܂��i���d���ł��j<br>
+<a href="lisp14.txt">マイオリジナルevalコード(lisp14.txt)</a> (2013/06/26 Version 1.2.0)<br>
+このテキストファイルの中身を丸ごと全部、下のテキストエリアにコピペして実行すれば試せます<br>
+このコードは純LISP用の純LISP仕様evalですが、この『少なLISP』でも動作します（糞重いです）<br>
 </div>
 <hr>
 <div class="a">
-<a href="lisp15.txt">�}�C�I���W�i��eval�R�[�h ���y(lisp15.txt)</a> (2013/06/26 Version 2.2.0)<br>
-��L��lisp14.txt�̃G���[�g���b�v��S�č폜���A�s�v�R�[�h�𐮗��������̂ł�<br>
-lisp14.txt�̂��̂��͂��y�߂̓���(���s��2�{���x����)�B�������G���[�g���b�v���S���Ȃ�����<br>
-�����▼�O�ȂǊԈ����LISP�R�[�h��eval�₻�̑��̊֐��ɗ^����Ƃǂ̂悤�ȋ��������邩�S���̕s���ł�<br>
+<a href="lisp15.txt">マイオリジナルevalコード やや軽(lisp15.txt)</a> (2013/06/26 Version 2.2.0)<br>
+上記のlisp14.txtのエラートラップを全て削除し、不要コードを整理したものです<br>
+lisp14.txtのものよりはやや軽めの動作(実行が2倍程度速い)。ただしエラートラップが全くないため<br>
+引数や名前など間違ったLISPコードをevalやその他の関数に与えるとどのような挙動をするか全くの不明です<br>
 </div>
 <!-- ************************************************************************************** -->
 
 <hr>
-<h4>LISP�R�[�h����</h4>
+<h4>LISPコード入力</h4>
 <form name="f">
-<textarea name="t" id="tx1" cols="140" rows="20">;�T���v���R�[�h
+<textarea name="t" id="tx1" cols="140" rows="20">;サンプルコード
 
-;subst ����(x:�l y:�V���{�� z:�l) z���̃V���{��y��x�̒l�ɒu��������֐�subst��錾
+;subst 引数(x:値 y:シンボル z:値) z中のシンボルyをxの値に置き換える関数substを宣言
 (label subst (lambda (x y z) (cond ((atom z) (cond ((eq y z) x) ((quote t) z))) ((quote t) (cons (subst x y (car z)) (subst x y (cdr z)))))))
 
-;���L�� (A (B C) A B C) ���� B �� (X Y) �ɒu������ (A ((X Y) C) A (X Y) C) �ɂȂ�
+;下記は (A (B C) A B C) 中の B を (X Y) に置き換え (A ((X Y) C) A (X Y) C) になる
 (subst (quote (X Y)) (quote B) (quote (A (B C) A B C)))
 </textarea><br>
-<input type="button" value="�N���A" onclick="clearCode();"><input type="button" value="���s����" onclick="test();">
+<input type="button" value="クリア" onclick="clearCode();"><input type="button" value="実行する" onclick="test();">
 </form>
 
 <!-- ************************************************************************************** -->
 
 <hr>
-<h4>���s����</h4>
+<h4>実行結果</h4>
 <div id="abc"></div>
 
 <!-- ************************************************************************************** -->
 
 <hr>
-<h4>�J���f�o�b�O�p�o��</h4>
-<form name="debug"><input type="button" value="��\��" onclick="clearDebug();"><input type="button" value="�\��" onclick="showDebug();"></form>
+<h4>開発デバッグ用出力</h4>
+<form name="debug"><input type="button" value="非表示" onclick="clearDebug();"><input type="button" value="表示" onclick="showDebug();"></form>
 <div id="efg"></div>
 
 <!-- ************************************************************************************** -->
 
 <hr>
-<h4>����(����`��)</h4>
+<h4>説明(特殊形式)</h4>
 <table border="1">
-<tr><th>���O</th><th>����</th><th>����</th><th>��</th></tr>
+<tr><th>名前</th><th>引数</th><th>説明</th><th>例</th></tr>
 
-<tr><td>COND</td><td>(�l �l)�� (�l �l)�� �c</td>
-<td>�����̊e���X�g�������]�����Ă���(���X�g�͂P�ȏ�K�v)<br>�����̃��X�g�̐擪�̒l��NIL�ȊO�Ȃ�΂ɂȂ�l��COND�̖߂�l�Ƃ��ĕԂ�<br>
-�����̃��X�g�̐擪�̒l��NIL�Ȃ玟�̈����̃��X�g��]������</td><td>(COND ((QUOTE A) (QUOTE B)) ((QUOTE T) (QUOTE C))) ; B<br>
+<tr><td>COND</td><td>(値 値)＊ (値 値)＊ …</td>
+<td>引数の各リストを順次評価していく(リストは１つ以上必要)<br>引数のリストの先頭の値がNIL以外なら対になる値をCONDの戻り値として返す<br>
+引数のリストの先頭の値がNILなら次の引数のリストを評価する</td><td>(COND ((QUOTE A) (QUOTE B)) ((QUOTE T) (QUOTE C))) ; B<br>
 (COND ((QUOTE NIL) (QUOTE B)) ((QUOTE T) (QUOTE C))) ; C</td></tr>
 
-<tr><td>LAMBDA</td><td>(�V���{���� �V���{���� �c)�� �l��<br>���́A<br>(�V���{���� �V���{���� �c . �V���{����)�� �l��<br>���́A<br>�V���{���� �l��<br>���́A<br>NIL�� �l��
-</td><td>���[�U�֐���ݒ肷��<br>�������Ƀ��[�U�֐��̉��������`����<br>
-�������ɂ̓V���{������ׂ����X�g�܂��̓V���{���Œ�`����<br>��������NIL�܂��͋󃊃X�g���w�肷��ƈ������Ƃ�Ȃ��֐�������<br>
-�������Ƀ��[�U�֐��Ăяo�����ɕ]������l(���s���]����)��n��<br>
-LAMBDA�̖߂�l�̓��[�U�֐��ւ̎Q�Ƃ�Ԃ�<br>���[�U�֐��͎��s���ɕϐ��X�R�[�v���`������<br>
-(���I�X�R�[�v���̗p���Ă���̂�<br>���[�U�֐����Ŗ���`�̕ϐ����g�p����Ă���ꍇ�ɂ�<br>���[�U�֐��Ăяo�����̕ϐ��X�R�[�v�ł��̕ϐ�����`���Ă���΂��̒l���g�p����)</td><td>(LAMBDA (X Y) (CONS (CONS X X) (CONS Y Y))) <br>
+<tr><td>LAMBDA</td><td>(シンボル＊ シンボル＊ …)＊ 値＊<br>又は、<br>(シンボル＊ シンボル＊ … . シンボル＊)＊ 値＊<br>又は、<br>シンボル＊ 値＊<br>又は、<br>NIL＊ 値＊
+</td><td>ユーザ関数を設定する<br>第一引数にユーザ関数の仮引数を定義する<br>
+仮引数にはシンボルを並べたリストまたはシンボルで定義する<br>第一引数にNILまたは空リストを指定すると引数をとらない関数を作れる<br>
+第二引数にユーザ関数呼び出し時に評価する値(実行時評価部)を渡す<br>
+LAMBDAの戻り値はユーザ関数への参照を返す<br>ユーザ関数は実行時に変数スコープを形成する<br>
+(動的スコープを採用しているので<br>ユーザ関数内で未定義の変数が使用されている場合には<br>ユーザ関数呼び出し元の変数スコープでその変数が定義してあればその値を使用する)</td><td>(LAMBDA (X Y) (CONS (CONS X X) (CONS Y Y))) <br>
 ((LAMBDA (X Y) (CONS (CONS X X) (CONS Y Y))) (QUOTE A) (QUOTE B)) ; ((A . A) B . B) <br>(LAMBDA () (QUOTE A))<br>((LAMBDA () (QUOTE A))); A<br>
 ((LAMBDA (X Y . Z) Z) (QUOTE A) (QUOTE B) (QUOTE C) (QUOTE D)) ; (C D)<br>((LAMBDA X X) (QUOTE A) (QUOTE B) (QUOTE C)) ; (A B C)</td></tr>
 
-<tr><td>LABEL<br>���́A<br>DEFINE</td><td>�V���{���� �lor�Q��</td><td>�������̃V���{���ɑ������̒lor�Q�Ƃ�ݒ肷��(�ϐ��ݒ�)<br>
-�������̃V���{���Ɏ��̗\��L�[���[�h�͎w��ł��Ȃ�<br>�@T NIL COND LAMBDA LABEL QUOTE DFINE<br>�@CONS CAR CDR EQ ATOM<br>LABEL�̖߂�l�͕ϐ��ɐݒ肵���l�ƂȂ�<br>
-LABEL��LABEL���s���_�̕ϐ��X�R�[�v�ɕϐ���ݒ肷��<br>(���[�U�֐��̎��s���]������LABEL���g���ƃ��[�U�֐����ł̂ݗL���ȕϐ��ƂȂ�)</td><td>(LABEL A (QUOTE B))<br>(CONS A A) ; (B . B)<br>
-(LABEL F (LAMBDA (X Y) (CONS X Y)))<br>(F (QUOTE A) (QUOTE  B)) ; (A . B)<br>(DEFINE A (QUOTE C)) ; LABEL�̑����DEFINE���g����<br>(CONS A A) ; (C . C) [LABEL�Ɠ�������]</td></tr>
+<tr><td>LABEL<br>又は、<br>DEFINE</td><td>シンボル＊ 値or参照</td><td>第一引数のシンボルに第二引数の値or参照を設定する(変数設定)<br>
+第一引数のシンボルに次の予約キーワードは指定できない<br>　T NIL COND LAMBDA LABEL QUOTE DFINE<br>　CONS CAR CDR EQ ATOM<br>LABELの戻り値は変数に設定した値となる<br>
+LABELはLABEL実行時点の変数スコープに変数を設定する<br>(ユーザ関数の実行時評価部でLABELを使うとユーザ関数内でのみ有効な変数となる)</td><td>(LABEL A (QUOTE B))<br>(CONS A A) ; (B . B)<br>
+(LABEL F (LAMBDA (X Y) (CONS X Y)))<br>(F (QUOTE A) (QUOTE  B)) ; (A . B)<br>(DEFINE A (QUOTE C)) ; LABELの代わりにDEFINEを使う例<br>(CONS A A) ; (C . C) [LABELと同じ動作]</td></tr>
 
-<tr><td>QUOTE</td><td>�l��</td><td>QUOTE�͖߂�l�Ƃ��Ĉ�����]�������ɂ��̂܂ܕԂ�<br>(�V���O���N�I�[�g[']���g�������L�\���ɑΉ�)</td><td>(QUOTE A) ; A<br>
+<tr><td>QUOTE</td><td>値＊</td><td>QUOTEは戻り値として引数を評価せずにそのまま返す<br>(シングルクオート[']を使った略記表現に対応)</td><td>(QUOTE A) ; A<br>
 (QUOTE (A . B)) ; (A . B)<br>(QUOTE (A B)) ; (A B)<br>(QUOTE (A B C . D)) ; (A B C . D)<br>
-'A ; (QUOTE A) �ɓ���<br>'(A B C) ; (QUOTE (A B C)) �ɓ���<br>'''X ; (QUOTE (QUOTE (QUOTE X))) �ɓ���</td></tr>
+'A ; (QUOTE A) に同じ<br>'(A B C) ; (QUOTE (A B C)) に同じ<br>'''X ; (QUOTE (QUOTE (QUOTE X))) に同じ</td></tr>
 
 </table>
-<div class="a">�Q�ƁF�֐������`���̖{�́i���g�j�B���X�g��]������Ƃ��Ƀ��X�g�̐擪�ɓn�������́B</div>
-<div class="a">�l�F�V���{���������̓��X�g</div>
-<div class="a">�V���{���F Atomic Symbol �̂��ƁB�A�g���Ƃ�����</div>
-<div class="a">���F���}�[�N�͊֐��E����`���̏������ɕ]�����Ȃ�������\���i���}�[�N�����������͑S�ĕ]�������j</div>
-<div class="a">�]���F�V���{���Ȃ�LABEL�Őݒ肳�ꂽ�l��Ԃ��B���X�g�Ȃ烊�X�g�̐擪���֐��܂��͓���`���A���X�g�̌���������Ƃ��ď�������</div>
+<div class="a">参照：関数や特殊形式の本体（中身）。リストを評価するときにリストの先頭に渡される実体。</div>
+<div class="a">値：シンボルもしくはリスト</div>
+<div class="a">シンボル： Atomic Symbol のこと。アトムとも言う</div>
+<div class="a">＊：＊マークは関数・特殊形式の処理時に評価しない部分を表す（＊マークが無い引数は全て評価される）</div>
+<div class="a">評価：シンボルならLABELで設定された値を返す。リストならリストの先頭を関数または特殊形式、リストの後方を引数として処理する</div>
 
 <!-- ************************************************************************************** -->
 
-<h4>����(�V�X�e���֐�)</h4>
+<h4>説明(システム関数)</h4>
 <table border="1">
-<tr><th>���O</th><th>����</th><th>����</th><th>��</th></tr>
+<tr><th>名前</th><th>引数</th><th>説明</th><th>例</th></tr>
 
-<tr><td>CONS</td><td>�l �l</td><td>�Q�̈����Ń��X�g�����</td><td>(CONS (QUOTE A) (QUOTE B)) ; (A . B)<br>
+<tr><td>CONS</td><td>値 値</td><td>２つの引数でリストを作る</td><td>(CONS (QUOTE A) (QUOTE B)) ; (A . B)<br>
 (CONS (QUOTE A) (QUOTE NIL)) ; (A)<br>(CONS (QUOTE A) (QUOTE (B))) ; (A B)<br>(CONS (QUOTE A) (QUOTE (B C))) ; (A B C)</td></tr>
 
-<tr><td>CAR</td><td>���X�g</td><td>���X�g�̐擪�����o��<br>�����ɃV���{����n���ƃG���[</td><td>(CAR (QUOTE (A . B))) ; A<br>(CAR (QUOTE (A B C))) ; A<br>
+<tr><td>CAR</td><td>リスト</td><td>リストの先頭を取り出す<br>引数にシンボルを渡すとエラー</td><td>(CAR (QUOTE (A . B))) ; A<br>(CAR (QUOTE (A B C))) ; A<br>
 (CAR (QUOTE ())) ; ()<br>(CAR (CONS (QUOTE A) (QUOTE B))) ; A</td></tr>
 
-<tr><td>CDR</td><td>���X�g</td><td>���X�g�̌�������o��<br>�����ɃV���{����n���ƃG���[</td><td>(CDR (QUOTE (A B C))) ; (B C)<br>(CDR (QUOTE ())) ; ()</td></tr>
+<tr><td>CDR</td><td>リスト</td><td>リストの後方を取り出す<br>引数にシンボルを渡すとエラー</td><td>(CDR (QUOTE (A B C))) ; (B C)<br>(CDR (QUOTE ())) ; ()</td></tr>
 
-<tr><td>EQ</td><td>�V���{�� �V���{��</td><td>�Q�̈����������V���{���Ȃ�T<br>����ȊO��NIL<br>
-�V���{���ȊO�������ɓn���ƃG���[</td><td>(EQ (QUOTE A) (QUOTE A)) ; T<br>(EQ (QUOTE A) (QUOTE B)) ; NIL<br>
-(EQ (QUOTE (A . B)) (QUOTE (A . B))) ; �G���[</td></tr>
+<tr><td>EQ</td><td>シンボル シンボル</td><td>２つの引数が同じシンボルならT<br>それ以外はNIL<br>
+シンボル以外を引数に渡すとエラー</td><td>(EQ (QUOTE A) (QUOTE A)) ; T<br>(EQ (QUOTE A) (QUOTE B)) ; NIL<br>
+(EQ (QUOTE (A . B)) (QUOTE (A . B))) ; エラー</td></tr>
 
-<tr><td>ATOM</td><td>�l</td><td>���������X�g�Ȃ�NIL<br>����ȊO��T</td><td>(ATOM (QUOTE A)) ; T<br>(ATOM (QUOTE (A B))) ; NIL<br>
+<tr><td>ATOM</td><td>値</td><td>引数がリストならNIL<br>それ以外はT</td><td>(ATOM (QUOTE A)) ; T<br>(ATOM (QUOTE (A B))) ; NIL<br>
 (ATOM (CONS (QUOTE A) (QUOTE B))) ; NIL</td></tr>
 
 </table>
-<div class="a">�l�F�V���{���������̓��X�g</div>
-<div class="a">�V���{���F Atomic Symbol �̂��ƁB�A�g���Ƃ�����</div>
-<div class="a">���F���}�[�N�͕]�����Ȃ�������\���i���}�[�N�����������͑S�ĕ]�������j</div>
-<div class="a">�]���F�V���{���Ȃ�LABEL�Őݒ肳�ꂽ�l��Ԃ��B���X�g�Ȃ烊�X�g�̐擪���֐��܂��͓���`���A���X�g�̌���������Ƃ��ď�������</div>
+<div class="a">値：シンボルもしくはリスト</div>
+<div class="a">シンボル： Atomic Symbol のこと。アトムとも言う</div>
+<div class="a">＊：＊マークは評価しない部分を表す（＊マークが無い引数は全て評価される）</div>
+<div class="a">評価：シンボルならLABELで設定された値を返す。リストならリストの先頭を関数または特殊形式、リストの後方を引数として処理する</div>
 
 <!-- ************************************************************************************** -->
 <hr>
-<h4>�Q�l�ɂ�������</h4>
+<h4>参考にした文献</h4>
 <div>[1]
 <span>LISP - Wikipedia</span><br>
 <span>http://ja.wikipedia.org/wiki/LISP</span>
 </div><br>
 <div>[2]
-<span>��LISP - Wikipedia<span><br>
+<span>純LISP - Wikipedia<span><br>
 <span>http://ja.wikipedia.org/wiki/%E7%B4%94LISP</span>
 </div><br>
 <div>[3]
@@ -198,33 +198,33 @@ LABEL��LABEL���s���_�̕ϐ��X�R�[�v�ɕϐ���ݒ肷��<br>(���[�U�֐��̎��s���]�����
 </div><br>
 <!-- ************************************************************************************** -->
 <hr>
-<h4>���̑�</h4>
-<div>���̉���script�^�O�ɂ��lisp�R�[�h���L�q���Ă��肢������LAMBDA�֐����`���Ă���B�y�[�W�ǂݍ��݊������Ɏ����I�Ɏ��s�����</div>
+<h4>その他</h4>
+<div>この下にscriptタグによりlispコードを記述してありいくつかのLAMBDA関数を定義してある。ページ読み込み完了時に自動的に実行される</div>
 <script type="text/javascript" language="javascript"><!--
-LISP.onLoadExecute(window); //�E�B���h�E�ǂݍ��݊�������script�\�[�X����lisp�R�[�h�����s���邱�Ƃ��w�����郁�\�b�h
+LISP.onLoadExecute(window); //ウィンドウ読み込み完了時にscriptソース内のlispコードを実行することを指示するメソッド
 //--></script>
-<!-- src�w�肾�ƃ\�[�X�R�[�h��JavaScript����ǂ߂Ȃ� -->
-<!-- ����T�[�o�[��Ƀt�@�C��������Ȃ�XMLHttpRequest�ł̎擾�Ƃ������@���l�����邪�c -->
+<!-- src指定だとソースコードをJavaScriptから読めない -->
+<!-- 同一サーバー上にファイルがあるならXMLHttpRequestでの取得という方法も考えられるが… -->
 <script type="text/x-sukuna-lisp" language="sukuna-lisp" src="lisp11.txt"></script>
-<!-- ���������ƃ\�[�X�R�[�h��JavaScript����ǂ߂� -->
-<!-- ���@�F script�^�O��DOM�G�������g��type�����𒲂�innerHTML�Ŏ擾 -->
-<!-- innerHTML�𗘗p����̂œ���script�^�O�ł���K�v���Ȃ��̂ł͂��邪 -->
+<!-- 直書きだとソースコードをJavaScriptから読める -->
+<!-- 方法： scriptタグのDOMエレメントでtype属性を調べinnerHTMLで取得 -->
+<!-- innerHTMLを利用するので特にscriptタグである必要もないのではあるが -->
 <script type="text/x-sukuna-lisp" language="sukuna-lisp">
-;<!-- ���R�����g�^�O���R�����g����(;)�ŉ������K�v����A�唼�̃u���E�U��script�^�O�Ȃ�R�����g����(;)���\������邱�Ƃ͂Ȃ�
+;<!-- ←コメントタグをコメント符号(;)で回避する必要あり、大半のブラウザのscriptタグならコメント符号(;)が表示されることはない
 
-;not    NIL�Ȃ� T�ANIL�ȊO�Ȃ� NIL�A
+;not    NILなら T、NIL以外なら NIL、
 (label not (lambda (x) (cond (x (quote nil)) ((quote t) (quote t)))))
 
-;list   �]�����������ŏ����X�g���\������
+;list   評価した引数で純リストを構成する
 (label list (lambda x x))
 
-;last   ���X�g�̍ŉ��̃��X�g��Ԃ�
+;last   リストの最奥のリストを返す
 (label last (lambda (x) (cond ((atom x) (quote nil)) ((atom (cdr x)) x) ((quote t) (last (cdr x))))))
 
-;progn  �S������]���������ƍŌ�̈�����Ԃ�
+;progn  全引数を評価したあと最後の引数を返す
 (label progn (lambda x (car (last x))))
 
-;car cdr �������[�e�B���e�B�Q
+;car cdr 合成ユーティリティ群
 (label caar (lambda (x) (car (car x))))
 (label caaar (lambda (x) (car (car (car x)))))
 (label caaaar (lambda (x) (car (car (car (car x))))))
@@ -258,8 +258,8 @@ LISP.onLoadExecute(window); //�E�B���h�E�ǂݍ��݊�������script�\�[�X����lisp�R�[
 (label cddddr (lambda (x) (cdr (cdr (cdr (cdr x))))))
 
 ;--></script>
-<div>��`����Ă���֐� not list last progn car/cdr�̒P�������֐��Q(caar cdar cddr �Ȃ�)</div>
-<div>�ڍׂ͂��̃y�[�W��HTML�\�[�X���Q�Ƃ��ꂽ��</div>
+<div>定義されている関数 not list last progn car/cdrの単純合成関数群(caar cdar cddr など)</div>
+<div>詳細はこのページのHTMLソースを参照されたし</div>
 <hr>
 </body>
 </html>

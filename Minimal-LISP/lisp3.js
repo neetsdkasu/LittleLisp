@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ƒVƒXƒeƒ€’è”
+//  ã‚·ã‚¹ãƒ†ãƒ å®šæ•°
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------
-//  LispData‚Ìƒ^ƒCƒv’è”
+//  LispDataã®ã‚¿ã‚¤ãƒ—å®šæ•°
 //-------------------------------------------------------------------------------------
 var DATATYPE_SYMBOL        = "symbol";
 var DATATYPE_LIST          = "list";
@@ -18,13 +18,13 @@ var DATATYPE_PROGRAM       = "program";
 var DATATYPE_ENDOFPROGRAM  = "end of program";
 
 //-------------------------------------------------------------------------------------
-//  Lisp’è”
+//  Lispå®šæ•°
 //-------------------------------------------------------------------------------------
 var SYMBOL_NIL      = "NIL";
 var SYMBOL_T        = "T";
 
 //-------------------------------------------------------------------------------------
-//  “Á•Ê®(Special Form)–¼
+//  ç‰¹åˆ¥å¼(Special Form)å
 //-------------------------------------------------------------------------------------
 var SPECIALFORM_QUOTE   = "QUOTE";
 var SPECIALFORM_COND    = "COND";
@@ -33,7 +33,7 @@ var SPECIALFORM_DEFINE  = "DEFINE";
 var SPECIALFORM_LABEL   = "LABEL";
 
 //-------------------------------------------------------------------------------------
-//  ƒVƒXƒeƒ€ŠÖ”(Fixed Function)–¼
+//  ã‚·ã‚¹ãƒ†ãƒ é–¢æ•°(Fixed Function)å
 //-------------------------------------------------------------------------------------
 var FIXEDFUNCTION_EQ      = "EQ";
 var FIXEDFUNCTION_CONS    = "CONS";
@@ -42,11 +42,11 @@ var FIXEDFUNCTION_CDR     = "CDR";
 var FIXEDFUNCTION_ATOM    = "ATOM";
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  Lispˆ——pŠÇ—ƒf[ƒ^ŠÖ˜A
+//  Lispå‡¦ç†ç”¨ç®¡ç†ãƒ‡ãƒ¼ã‚¿é–¢é€£
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------
-//  LispData            Lispˆ——pŠÇ—ƒf[ƒ^ƒRƒ“ƒeƒi
+//  LispData            Lispå‡¦ç†ç”¨ç®¡ç†ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ³ãƒ†ãƒŠ
 //-------------------------------------------------------------------------------------
 function LispData(name, data, type) {
     if (type == DATATYPE_LIST) {
@@ -67,11 +67,11 @@ function LispData(name, data, type) {
     this.isFunction       = function () { return ((type == DATATYPE_FIXEDFUNCTION) || (type == DATATYPE_SPECIALFORM) || (type == DATATYPE_LAMBDA)); };
     this.isComment        = function () { return (type == DATATYPE_COMMENT); };
     this.isError          = function () { return (type == DATATYPE_ERROR); };
-    this.gc = function () { name = null; data = null; type = null; }; //Ä—˜—pŠ®‘S•s‰Â
+    this.gc = function () { name = null; data = null; type = null; }; //å†åˆ©ç”¨å®Œå…¨ä¸å¯
 }
 
 //-------------------------------------------------------------------------------------
-//  getSymbol           ƒVƒ“ƒ{ƒ‹ƒ^ƒCƒv‚ÌLispData‚ğæ“¾‚·‚é
+//  getSymbol           ã‚·ãƒ³ãƒœãƒ«ã‚¿ã‚¤ãƒ—ã®LispDataã‚’å–å¾—ã™ã‚‹
 //-------------------------------------------------------------------------------------
 var getSymbol = new function () {
     var symbols = new Array();
@@ -86,7 +86,7 @@ var getSymbol = new function () {
 };
 
 //-------------------------------------------------------------------------------------
-//  LispDataŒ^’è”
+//  LispDataå‹å®šæ•°
 //-------------------------------------------------------------------------------------
 var LISPDATA_T         = getSymbol(SYMBOL_T);
 var LISPDATA_NIL       = getSymbol(SYMBOL_NIL);
@@ -94,7 +94,7 @@ var LISPDATA_EMPTYLIST = new LispData(SYMBOL_NIL, SYMBOL_NIL, DATATYPE_EMPTYLIST
 var LISPDATA_ERROR     = new LispData("Unknown Error", "Cause is unknown.", DATATYPE_ERROR); 
 
 //-------------------------------------------------------------------------------------
-//  wrapListInLispData          ”z—ñ‚ğƒŠƒXƒgƒf[ƒ^(LispData)‚É‚·‚é
+//  wrapListInLispData          é…åˆ—ã‚’ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿(LispData)ã«ã™ã‚‹
 //-------------------------------------------------------------------------------------
 function wrapListInLispData(list) {
     if (list.length == 2) {
@@ -109,29 +109,29 @@ function wrapListInLispData(list) {
 }
 
 //-------------------------------------------------------------------------------------
-//  makeError                   ”CˆÓ‚ÌƒGƒ‰[ƒf[ƒ^(LispData)‚ğ¶¬‚·‚é
+//  makeError                   ä»»æ„ã®ã‚¨ãƒ©ãƒ¼ãƒ‡ãƒ¼ã‚¿(LispData)ã‚’ç”Ÿæˆã™ã‚‹
 //-------------------------------------------------------------------------------------
 function makeError(name, description) {
     return new LispData(name, description, DATATYPE_ERROR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  •Ï”ƒRƒ“ƒeƒi
+//  å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------
-//  VariableContainer           •W€‚Ì•Ï”ƒRƒ“ƒeƒi
+//  VariableContainer           æ¨™æº–ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
 //-------------------------------------------------------------------------------------
 function VariableContainer(parent) {
-    //•Ï”ƒf[ƒ^(LispData)‚ğŠi”[‚·‚é
+    //å¤‰æ•°ãƒ‡ãƒ¼ã‚¿(LispData)ã‚’æ ¼ç´ã™ã‚‹
     var vars = new Array();
-    //eƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+    //è¦ªã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
     this.getParent = function () { return parent; };
-    //•Ï”‚ğæ“¾‚·‚é
+    //å¤‰æ•°ã‚’å–å¾—ã™ã‚‹
     this.getVariable = function (key) {
         return vars[key].getData();
     }
-    //•Ï”‚ğİ’è‚·‚é
+    //å¤‰æ•°ã‚’è¨­å®šã™ã‚‹
     this.setVariable = function (key, data) {
         if (vars[key]) {
             vars[key].gc();
@@ -140,7 +140,7 @@ function VariableContainer(parent) {
         vars[key] = new LispData(key, data, DATATYPE_VARIABLE);
         return vars[key];
     };
-    //•Ï”‚ğŠi”[‚·‚éƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+    //å¤‰æ•°ã‚’æ ¼ç´ã™ã‚‹ã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
     this.getVariableContainer = function (key) {
         if (vars[key]) {
             return this;
@@ -152,23 +152,23 @@ function VariableContainer(parent) {
             }
         }
     };
-    //ˆê•”•Ï”‚Ì‰ğ•ú
+    //ä¸€éƒ¨å¤‰æ•°ã®è§£æ”¾
     this.release = function () {
         var i, key, c = 0;
         for (i in vars) {
             key = vars[i].getName();
             if (parent.getVariableContainer(key) != null) {
-                //lambda‚ÌƒNƒ[ƒWƒƒ‚É•ß”›‚³‚ê‚È‚¢
+                //lambdaã®ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£ã«æ•ç¸›ã•ã‚Œãªã„
                 vars[i].gc();
                 vars[i] = null;
             } else {
-                c++; //•Û‚µ‚Ä‚é•Ï””
+                c++; //ä¿æŒã—ã¦ã‚‹å¤‰æ•°æ•°
             }
         }
         return c;
     };
-    //ƒKƒx[ƒWƒRƒŒƒNƒg
-    this.gc = function () {  //Ä—˜—pŠ®‘S•s‰Â
+    //ã‚¬ãƒ™ãƒ¼ã‚¸ã‚³ãƒ¬ã‚¯ãƒˆ
+    this.gc = function () {  //å†åˆ©ç”¨å®Œå…¨ä¸å¯
         var i;
         for (i in vars) {
             vars[i] = null;
@@ -179,12 +179,12 @@ function VariableContainer(parent) {
 }
 
 //-------------------------------------------------------------------------------------
-//  LambdaVariableContainer     LAMBDA»ŠÖ”‚Ì‰¼ˆø”—p‚Ì•Ï”ƒRƒ“ƒeƒi
+//  LambdaVariableContainer     LAMBDAè£½é–¢æ•°ã®ä»®å¼•æ•°ç”¨ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
 //-------------------------------------------------------------------------------------
 function LambdaVariableContainer(closedvc, currentvc) {
-    //eƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+    //è¦ªã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
     this.getParent = function () { return currentvc; };
-    //•Ï”‚ğæ“¾‚·‚é
+    //å¤‰æ•°ã‚’å–å¾—ã™ã‚‹
     this.getVariable = function (key) {
         var vc;
         vc = closedvc.getVariableContainer(key);
@@ -196,7 +196,7 @@ function LambdaVariableContainer(closedvc, currentvc) {
         }
         return vc.getVariable(key);
     };
-    //•Ï”‚ğİ’è‚·‚é
+    //å¤‰æ•°ã‚’è¨­å®šã™ã‚‹
     this.setVariable = function (key, data) {
         var vc;
         vc = closedvc.getVariableContainer(key);
@@ -208,7 +208,7 @@ function LambdaVariableContainer(closedvc, currentvc) {
         }
         vc.setVariable(key, data);
     };
-    //•Ï”‚ğŠi”[‚µ‚Ä‚éƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+    //å¤‰æ•°ã‚’æ ¼ç´ã—ã¦ã‚‹ã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
     this.getVariableContainer = function (key) {
         var vc;
         vc = closedvc.getVariableContainer(key);
@@ -217,12 +217,12 @@ function LambdaVariableContainer(closedvc, currentvc) {
         }
         return currentvc.getVariableContainer(key);
     };
-    //ˆê•”‚Ì•Ï”‚Ì‰ğ•ú
+    //ä¸€éƒ¨ã®å¤‰æ•°ã®è§£æ”¾
     this.release = function () {
         return 0;
     };
-    //ƒKƒx[ƒWƒRƒŒƒNƒg
-    this.gc = function () {  //Ä—˜—pŠ®‘S•s‰Â
+    //ã‚¬ãƒ™ãƒ¼ã‚¸ã‚³ãƒ¬ã‚¯ãƒˆ
+    this.gc = function () {  //å†åˆ©ç”¨å®Œå…¨ä¸å¯
         closedvc = null;
         currentvc = null;
     };
@@ -230,37 +230,37 @@ function LambdaVariableContainer(closedvc, currentvc) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  •Ï”‚ÌƒXƒR[ƒv‚ÌŠÇ—
+//  å¤‰æ•°ã®ã‚¹ã‚³ãƒ¼ãƒ—ã®ç®¡ç†
 ///////////////////////////////////////////////////////////////////////////////////////
 
-//ƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚Ì•Ï”ƒRƒ“ƒeƒi
+//ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
 var GlobalVariableContainer = new VariableContainer(null);
 
-//Œ»İ‚ÌƒXƒR[ƒv‚Ì•Ï”ƒRƒ“ƒeƒi
+//ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
 var CurrentVariableContainer = GlobalVariableContainer;
 
 //-------------------------------------------------------------------------------------
-//  resetScope                  Œ»İ‚ÌƒXƒR[ƒv‚ğƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚É‚·‚é
+//  resetScope                  ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã‚’ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã«ã™ã‚‹
 //-------------------------------------------------------------------------------------
 function resetScope() {
     CurrentVariableContainer = GlobalVariableContainer;
 }
 //-------------------------------------------------------------------------------------
-//  inNewScope                  V‚µ‚¢ƒXƒR[ƒv‚É“ü‚é
+//  inNewScope                  æ–°ã—ã„ã‚¹ã‚³ãƒ¼ãƒ—ã«å…¥ã‚‹
 //-------------------------------------------------------------------------------------
 function inNewScope() {
     CurrentVariableContainer = new VariableContainer(CurrentVariableContainer);
 }
 
 //-------------------------------------------------------------------------------------
-//  inNewLambdaScope            V‚µ‚¢LAMBDA»ŠÖ”‚ÌƒXƒR[ƒv‚É“ü‚é
+//  inNewLambdaScope            æ–°ã—ã„LAMBDAè£½é–¢æ•°ã®ã‚¹ã‚³ãƒ¼ãƒ—ã«å…¥ã‚‹
 //-------------------------------------------------------------------------------------
 function inNewLambdaScope(closedvc) {
     CurrentVariableContainer = new VariableContainer(new LambdaVariableContainer(closedvc, CurrentVariableContainer));
 }
 
 //-------------------------------------------------------------------------------------
-//  outNowScope                 Œ»İ‚ÌƒXƒR[ƒv‚©‚ç”²‚¯‚é
+//  outNowScope                 ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã‹ã‚‰æŠœã‘ã‚‹
 //-------------------------------------------------------------------------------------
 function outNowScope() {
     var tmp = CurrentVariableContainer;
@@ -268,12 +268,12 @@ function outNowScope() {
     if (CurrentVariableContainer != null) {
         tmp.release();
     } else {
-        CurrentVariableContainer = tmp; //GrobalVariableContainer‚Ì‚Í‚¸
+        CurrentVariableContainer = tmp; //GrobalVariableContainerã®ã¯ãš
     }
 }
 
 //-------------------------------------------------------------------------------------
-//  outNowLambdaScope           Œ»İ‚ÌLAMBDA»ŠÖ”‚ÌƒXƒR[ƒv‚©‚ç”²‚¯‚é
+//  outNowLambdaScope           ç¾åœ¨ã®LAMBDAè£½é–¢æ•°ã®ã‚¹ã‚³ãƒ¼ãƒ—ã‹ã‚‰æŠœã‘ã‚‹
 //-------------------------------------------------------------------------------------
 function outNowLambdaScope() {
     var tmp = CurrentVariableContainer.getParent();
@@ -281,29 +281,29 @@ function outNowLambdaScope() {
     if (CurrentVariableContainer != null) {
         tmp.release();
     } else {
-        CurrentVariableContainer = tmp; //GrobalVariableContainer‚Ì‚Í‚¸
+        CurrentVariableContainer = tmp; //GrobalVariableContainerã®ã¯ãš
     }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ˆø”ƒ†[ƒeƒBƒŠƒeƒBŠÖ”
+//  å¼•æ•°ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£é–¢æ•°
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------
-//  getArgs             •W€ŠÖ”E“Á•Ê®‚ÌÀˆø”‚ğæ“¾‚·‚é
+//  getArgs             æ¨™æº–é–¢æ•°ãƒ»ç‰¹åˆ¥å¼ã®å®Ÿå¼•æ•°ã‚’å–å¾—ã™ã‚‹
 //-------------------------------------------------------------------------------------
-//ˆø”
-//  list    LispData                Àˆø”‚ÌƒŠƒXƒg
-//  n       Integer                 æ“¾‚µ‚½‚¢Àˆø”‚Ì”
-//  argc    Array                   •]‰¿Œã‚ÌÀˆø”(LispData)‚ªŠi”[‚³‚ê‚é
-//’ˆÓ
-//  argc‚ÉŠi”[‚³‚ê‚éÀˆø”‚Ì‡”Ô‚Í‹t‡‚É‚È‚é
-//  —á Àˆø”‚ª 3‚Â‚Ì‚Æ‚«‚ÍˆÈ‰º‚Ì‚æ‚¤‚ÉŠi”[‚³‚ê‚é
-//     1”Ô–Ú‚ÌÀˆø”‚Íargc[2], 2”Ô–Ú‚ÌÀˆø”‚Íargs[1], 3”Ô–Ú‚ÌÀˆø”‚Íargc[0]
+//å¼•æ•°
+//  list    LispData                å®Ÿå¼•æ•°ã®ãƒªã‚¹ãƒˆ
+//  n       Integer                 å–å¾—ã—ãŸã„å®Ÿå¼•æ•°ã®æ•°
+//  argc    Array                   è©•ä¾¡å¾Œã®å®Ÿå¼•æ•°(LispData)ãŒæ ¼ç´ã•ã‚Œã‚‹
+//æ³¨æ„
+//  argcã«æ ¼ç´ã•ã‚Œã‚‹å®Ÿå¼•æ•°ã®é †ç•ªã¯é€†é †ã«ãªã‚‹
+//  ä¾‹ å®Ÿå¼•æ•°ãŒ 3ã¤ã®ã¨ãã¯ä»¥ä¸‹ã®ã‚ˆã†ã«æ ¼ç´ã•ã‚Œã‚‹
+//     1ç•ªç›®ã®å®Ÿå¼•æ•°ã¯argc[2], 2ç•ªç›®ã®å®Ÿå¼•æ•°ã¯args[1], 3ç•ªç›®ã®å®Ÿå¼•æ•°ã¯argc[0]
 //     (F 'A 'B 'C) => A -> argc[2], B -> argc[1], C -> argc[0] 
-//–ß‚è’l
-//  Boolean         Àˆø”‚Ìæ“¾‚É¬Œ÷‚µ‚½‚ç true A¸”s‚µ‚½‚ç false
+//æˆ»ã‚Šå€¤
+//  Boolean         å®Ÿå¼•æ•°ã®å–å¾—ã«æˆåŠŸã—ãŸã‚‰ true ã€å¤±æ•—ã—ãŸã‚‰ false
 //-------------------------------------------------------------------------------------
 function getArgs(list, n, argc) {
     var tmp;
@@ -324,12 +324,12 @@ function getArgs(list, n, argc) {
 }
 
 //-------------------------------------------------------------------------------------
-//  getLambdaArgs       LAMBDA»ŠÖ”‚ÌÀˆø”‚ğæ“¾‚·‚é
+//  getLambdaArgs       LAMBDAè£½é–¢æ•°ã®å®Ÿå¼•æ•°ã‚’å–å¾—ã™ã‚‹
 //-------------------------------------------------------------------------------------
-//ˆø”
-//  list    LispData                Àˆø”‚ÌƒŠƒXƒg
-//–ß‚è’l
-//  LispData        •]‰¿Œã‚ÌÀˆø”‚ÌƒŠƒXƒg
+//å¼•æ•°
+//  list    LispData                å®Ÿå¼•æ•°ã®ãƒªã‚¹ãƒˆ
+//æˆ»ã‚Šå€¤
+//  LispData        è©•ä¾¡å¾Œã®å®Ÿå¼•æ•°ã®ãƒªã‚¹ãƒˆ
 //-------------------------------------------------------------------------------------
 function getLambdaArgs(list) {
     var n, s, tmp, tmp2;
@@ -356,10 +356,10 @@ function getLambdaArgs(list) {
 }
 
 //-------------------------------------------------------------------------------------
-//  setLambdaArgs       LAMBDA»ŠÖ”‚ÌÀˆø”‚ğ‰¼ˆø”‚Éİ’è‚·‚é
+//  setLambdaArgs       LAMBDAè£½é–¢æ•°ã®å®Ÿå¼•æ•°ã‚’ä»®å¼•æ•°ã«è¨­å®šã™ã‚‹
 //-------------------------------------------------------------------------------------
-//ˆø”
-//  list        LispData        ‰¼ˆø”‚ÌƒŠƒXƒg
+//å¼•æ•°
+//  list        LispData        ä»®å¼•æ•°ã®ãƒªã‚¹ãƒˆ
 //-------------------------------------------------------------------------------------
 function setLambdaArgs(list, arglist) {
     var tmp, tmp2;
@@ -385,11 +385,11 @@ function setLambdaArgs(list, arglist) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  LAMBDA»ŠÖ”‚ÌÀs
+//  LAMBDAè£½é–¢æ•°ã®å®Ÿè¡Œ
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------
-//  doLambdaFunction            LAMBDA»ŠÖ”‚ğÀs‚·‚é
+//  doLambdaFunction            LAMBDAè£½é–¢æ•°ã‚’å®Ÿè¡Œã™ã‚‹
 //-------------------------------------------------------------------------------------
 function doLambdaFunction(cmd, list) {
     var tmp, arglist;
@@ -413,20 +413,20 @@ function doLambdaFunction(cmd, list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  “Á•Ê®(Special Form)‚Ì’è‹`
+//  ç‰¹åˆ¥å¼(Special Form)ã®å®šç¾©
 ///////////////////////////////////////////////////////////////////////////////////////
 
-//“Á•Ê®—p‚Ìƒf[ƒ^(LispData)‚ğŠi”[‚·‚é
+//ç‰¹åˆ¥å¼ç”¨ã®ãƒ‡ãƒ¼ã‚¿(LispData)ã‚’æ ¼ç´ã™ã‚‹
 var SpecialForms = new Array();
 
 //-------------------------------------------------------------------------------------
-// QUOTE “Á•Ê®(Special Form)
+// QUOTE ç‰¹åˆ¥å¼(Special Form)
 //-------------------------------------------------------------------------------------
-// ‘®
+// æ›¸å¼
 //  (QUOTE OBJECT)
-// –ß‚è’l
+// æˆ»ã‚Šå€¤
 //  OBJECT
-// —á
+// ä¾‹
 //  (QUOTE A)                -> A
 //  (QUOTE (A . B))          -> (A . B)
 //  (QUOTE (A B))            -> (A B)
@@ -448,14 +448,14 @@ SpecialForms[SPECIALFORM_QUOTE] = new LispData(SPECIALFORM_QUOTE, function (cmd,
     }, DATATYPE_SPECIALFORM);
 
 //-------------------------------------------------------------------------------------
-// COND “Á•Ê®(Special Form)
+// COND ç‰¹åˆ¥å¼(Special Form)
 //-------------------------------------------------------------------------------------
-// ‘®
-//  (COND (TEST-1 FORM-1) (TEST-2 FORM-2) ` (TEST-N FORM-N))
+// æ›¸å¼
+//  (COND (TEST-1 FORM-1) (TEST-2 FORM-2) ï½ (TEST-N FORM-N))
 //  (COND {(TEST FORM)}+)
-//  Å’á‚Å‚à‚P‘Î‚ÌTEST‚ÆFORM‚ª•K—v
+//  æœ€ä½ã§ã‚‚ï¼‘å¯¾ã®TESTã¨FORMãŒå¿…è¦
 //  
-// —á
+// ä¾‹
 //  (COND ('A 'B) ('C 'D))                  -> B            ;arg is (('A 'B) . (('C 'D) . NIL)), tmp[0] is ('A 'B), tmp[1] is (('C 'D) . NIL)
 //  (COND ('C 'D))                          -> D            ;arg is (('C 'D) . NIL), tmp[0] is ('C 'D), tmp[1] is NIL
 //  (COND (NIL 'A) ('B (CONS 'C '(D E))))   -> (C D E)
@@ -489,7 +489,7 @@ SpecialForms[SPECIALFORM_COND] = new LispData(SPECIALFORM_COND, function (cmd, l
     }, DATATYPE_SPECIALFORM);
 
 //-------------------------------------------------------------------------------------
-// DEFINE “Á•Ê®(Special Form)
+// DEFINE ç‰¹åˆ¥å¼(Special Form)
 //-------------------------------------------------------------------------------------
 SpecialForms[SPECIALFORM_DEFINE] = new LispData(SPECIALFORM_DEFINE, function (cmd, list) {
         var tmp, vc, s, argc;
@@ -519,19 +519,19 @@ SpecialForms[SPECIALFORM_DEFINE] = new LispData(SPECIALFORM_DEFINE, function (cm
     }, DATATYPE_SPECIALFORM);
 
 //-------------------------------------------------------------------------------------
-// LABEL “Á•Ê®(Special Form)
+// LABEL ç‰¹åˆ¥å¼(Special Form)
 //-------------------------------------------------------------------------------------
-// “Á•Ê®DEFINE‚Æ“¯‚¶“®ì
+// ç‰¹åˆ¥å¼DEFINEã¨åŒã˜å‹•ä½œ
 //-------------------------------------------------------------------------------------
 SpecialForms[SPECIALFORM_LABEL] = new LispData(SPECIALFORM_LABEL, SpecialForms[SPECIALFORM_DEFINE].getData(), DATATYPE_SPECIALFORM);
 
 
 //-------------------------------------------------------------------------------------
-// LAMBDA “Á•Ê®(Special Form)
+// LAMBDA ç‰¹åˆ¥å¼(Special Form)
 //-------------------------------------------------------------------------------------
-//  (LAMBDA (V-1 V-2 ` V-N) FORM)
+//  (LAMBDA (V-1 V-2 ï½ V-N) FORM)
 //  (LAMBDA (VAR*) FORM)
-// —á
+// ä¾‹
 //  (LAMBDA (X Y Z) (CONS X (CONS Y Z)))
 //-------------------------------------------------------------------------------------
 SpecialForms[SPECIALFORM_LAMBDA] = new LispData(SPECIALFORM_LAMBDA, function (cmd, list) {
@@ -586,17 +586,17 @@ SpecialForms[SPECIALFORM_LAMBDA] = new LispData(SPECIALFORM_LAMBDA, function (cm
     
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ŒÅ—LŠÖ” ’è‹`
+//  å›ºæœ‰é–¢æ•° å®šç¾©
 ///////////////////////////////////////////////////////////////////////////////////////
 var FixedFunctions = new Array();
 
 
 //-------------------------------------------------------------------------------------
-// ATOM ŠÖ”(Fixed Function)
+// ATOM é–¢æ•°(Fixed Function)
 //-------------------------------------------------------------------------------------
 // (ATOM OBJECT)
-// –ß‚è’l
-//  OBJECT‚ªSYMBOL‚È‚çTALIST‚È‚çNIL‚ğ•Ô‚·B
+// æˆ»ã‚Šå€¤
+//  OBJECTãŒSYMBOLãªã‚‰Tã€LISTãªã‚‰NILã‚’è¿”ã™ã€‚
 //-------------------------------------------------------------------------------------
 FixedFunctions[FIXEDFUNCTION_ATOM] = new LispData(FIXEDFUNCTION_ATOM, function (cmd, list) {
         var argc = new Array();
@@ -613,9 +613,9 @@ FixedFunctions[FIXEDFUNCTION_ATOM] = new LispData(FIXEDFUNCTION_ATOM, function (
     }, DATATYPE_FIXEDFUNCTION);
 
 //-------------------------------------------------------------------------------------
-// EQ ŠÖ”(Fixed Function)
+// EQ é–¢æ•°(Fixed Function)
 //-------------------------------------------------------------------------------------
-// “¯‚¶ƒVƒ“ƒ{ƒ‹‚È‚ç T A‚»‚êˆÈŠO‚Í NIL
+// åŒã˜ã‚·ãƒ³ãƒœãƒ«ãªã‚‰ T ã€ãã‚Œä»¥å¤–ã¯ NIL
 //-------------------------------------------------------------------------------------
 FixedFunctions[FIXEDFUNCTION_EQ] = new LispData(FIXEDFUNCTION_EQ, function (cmd, list) {
         var argc = new Array();
@@ -634,17 +634,17 @@ FixedFunctions[FIXEDFUNCTION_EQ] = new LispData(FIXEDFUNCTION_EQ, function (cmd,
     }, DATATYPE_FIXEDFUNCTION);
 
 //-------------------------------------------------------------------------------------
-//  CAR ŠÖ”(Fixed Function)
+//  CAR é–¢æ•°(Fixed Function)
 //-------------------------------------------------------------------------------------
-//  ‘æ‚Pˆø”‚É“n‚µ‚½ƒŠƒXƒg‚Ìæ“ª‚Ì’l‚ğæ‚èo‚·
-// —á
+//  ç¬¬ï¼‘å¼•æ•°ã«æ¸¡ã—ãŸãƒªã‚¹ãƒˆã®å…ˆé ­ã®å€¤ã‚’å–ã‚Šå‡ºã™
+// ä¾‹
 //  (CAR ('A 'B 'C))            -> A
 //  (CAR ('E . 'F))             -> E
 //  (CAR (('X 'Y) 'Z))          -> (X Y)
 //  (CAR ('N))                  -> 'N
-// —áŠO(ƒGƒ‰[)ƒpƒ^[ƒ“
-//  (CAR 'A)                    ; ƒŠƒXƒgˆÈŠO‚ªˆø”‚É“n‚³‚ê‚é
-//  (CAR ('A 'B) ('C 'D))       ; ˆø”‚ª•¡”‚ ‚é
+// ä¾‹å¤–(ã‚¨ãƒ©ãƒ¼)ãƒ‘ã‚¿ãƒ¼ãƒ³
+//  (CAR 'A)                    ; ãƒªã‚¹ãƒˆä»¥å¤–ãŒå¼•æ•°ã«æ¸¡ã•ã‚Œã‚‹
+//  (CAR ('A 'B) ('C 'D))       ; å¼•æ•°ãŒè¤‡æ•°ã‚ã‚‹
 //  (CAR . ('A 'B))
 //-------------------------------------------------------------------------------------
 FixedFunctions[FIXEDFUNCTION_CAR] = new LispData(FIXEDFUNCTION_CAR, function (cmd, list) {
@@ -665,7 +665,7 @@ FixedFunctions[FIXEDFUNCTION_CAR] = new LispData(FIXEDFUNCTION_CAR, function (cm
     }, DATATYPE_FIXEDFUNCTION);
 
 //-------------------------------------------------------------------------------------
-// CDR ŠÖ”(Fixed Function)
+// CDR é–¢æ•°(Fixed Function)
 //-------------------------------------------------------------------------------------
 FixedFunctions[FIXEDFUNCTION_CDR] = new LispData(FIXEDFUNCTION_CDR, function (cmd, list) {
         var tmp, argc = new Array();
@@ -685,7 +685,7 @@ FixedFunctions[FIXEDFUNCTION_CDR] = new LispData(FIXEDFUNCTION_CDR, function (cm
     }, DATATYPE_FIXEDFUNCTION);
 
 //-------------------------------------------------------------------------------------
-// CONS ŠÖ”(Fixed Function)
+// CONS é–¢æ•°(Fixed Function)
 //-------------------------------------------------------------------------------------
 FixedFunctions[FIXEDFUNCTION_CONS] = new LispData(FIXEDFUNCTION_CONS, function (cmd, list) {
         var argc = new Array();
@@ -705,14 +705,14 @@ FixedFunctions[FIXEDFUNCTION_CONS] = new LispData(FIXEDFUNCTION_CONS, function (
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  \•¶ ‰ğÍ • •ª‰ğ
+//  æ§‹æ–‡ è§£æ ï¼† åˆ†è§£
 ///////////////////////////////////////////////////////////////////////////////////////
 function hoge(str, p, list){
 	var i, c, s, newlist, tmp, t = 0, e = 0, q = 0;
 	var makeLispData = function (data, n) {
 	    if (n == 0) {
 	        if (typeof(data) == "string") {
-                return getSymbol(data); //‚Å‚«‚ê‚Î“¯ˆê–¼ƒVƒ“ƒ{ƒ‹‚ÍÄ—˜—p‚µ‚½‚¢‚Æ‚±‚ë
+                return getSymbol(data); //ã§ãã‚Œã°åŒä¸€åã‚·ãƒ³ãƒœãƒ«ã¯å†åˆ©ç”¨ã—ãŸã„ã¨ã“ã‚
             } else {
                 return wrapListInLispData(data);
             }
@@ -725,28 +725,28 @@ function hoge(str, p, list){
 	    list[1] = wrapListInLispData(tmp);
 	    return wrapListInLispData(list);
 	};
-	/** t (ó‘Ô‘JˆÚ/—LŒÀƒI[ƒgƒ}ƒgƒ“)
-	 * 	0 ˆê‚Â–Ú‚Ì—v‘f‚Ì“Ç‚İæ‚èŠJn‘O’iŠK
-	 * 	1 ˆê‚Â–Ú‚Ì—v‘f‚ÍƒVƒ“ƒ{ƒ‹‚Å“Ç‚İæ‚è’†
-	 * 	2 ˆê‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒg
-	 * 	3 ˆê‚Â–Ú‚Ì—v‘f‚ğ“o˜^Š®—¹
-	 * 	4 ˆê‚Â–Ú‚Ì—v‘f‚Æ“ñ‚Â–Ú‚Ì—v‘f‚ğŒq‚®'.'“Ç‚İæ‚è‘O’iŠK
-	 * 	5 “ñ‚Â–Ú‚Ì—v‘f‚Ì“Ç‚İæ‚èŠJn‘O’iŠK
-	 * 	6 “ñ‚Â–Ú‚Ì—v‘f‚ÍƒVƒ“ƒ{ƒ‹‚Å“Ç‚İæ‚è’†
-	 * 	7 “ñ‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒg
+	/** t (çŠ¶æ…‹é·ç§»/æœ‰é™ã‚ªãƒ¼ãƒˆãƒãƒˆãƒ³)
+	 * 	0 ä¸€ã¤ç›®ã®è¦ç´ ã®èª­ã¿å–ã‚Šé–‹å§‹å‰æ®µéš
+	 * 	1 ä¸€ã¤ç›®ã®è¦ç´ ã¯ã‚·ãƒ³ãƒœãƒ«ã§èª­ã¿å–ã‚Šä¸­
+	 * 	2 ä¸€ã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆ
+	 * 	3 ä¸€ã¤ç›®ã®è¦ç´ ã‚’ç™»éŒ²å®Œäº†
+	 * 	4 ä¸€ã¤ç›®ã®è¦ç´ ã¨äºŒã¤ç›®ã®è¦ç´ ã‚’ç¹‹ã'.'èª­ã¿å–ã‚Šå‰æ®µéš
+	 * 	5 äºŒã¤ç›®ã®è¦ç´ ã®èª­ã¿å–ã‚Šé–‹å§‹å‰æ®µéš
+	 * 	6 äºŒã¤ç›®ã®è¦ç´ ã¯ã‚·ãƒ³ãƒœãƒ«ã§èª­ã¿å–ã‚Šä¸­
+	 * 	7 äºŒã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆ
 	 **/
 	for (i = p; i < str.length; i++) {
 		c = str.charAt(i);
 		if (c == '(') {
-			if (t == 0) { //ˆê‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒg
+			if (t == 0) { //ä¸€ã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆ
 				newlist = new Array();
 				i = hoge(str, i + 1, newlist);
 				t = 2;
-			} else if (t == 3) { // . ‚ÌÈ—ªA“ñ‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒgi‚»‚ÌƒŠƒXƒg‚Ìˆê‚Â–Ú‚Ì—v‘f‚ªƒŠƒXƒgj
+			} else if (t == 3) { // . ã®çœç•¥ã€äºŒã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆï¼ˆãã®ãƒªã‚¹ãƒˆã®ä¸€ã¤ç›®ã®è¦ç´ ãŒãƒªã‚¹ãƒˆï¼‰
 				newlist = new Array();
 				i = hoge(str, i, newlist) - 1;
 				t = 7;
-			} else if (t == 5) { //“ñ‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒg
+			} else if (t == 5) { //äºŒã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆ
 			    newlist = new Array();
 			    i = hoge(str, i + 1, newlist);
 			    t = 7;
@@ -756,39 +756,39 @@ function hoge(str, p, list){
 			}
 		
 		} else if (c == ')') {
-			if (t == 1) { //—v‘f‚ªˆê‚Â‚µ‚©‚È‚¢i—v‘f‚ÍƒVƒ“ƒ{ƒ‹j
+			if (t == 1) { //è¦ç´ ãŒä¸€ã¤ã—ã‹ãªã„ï¼ˆè¦ç´ ã¯ã‚·ãƒ³ãƒœãƒ«ï¼‰
 			    list[0] = makeLispData(s.toUpperCase(), q);
 				list[1] = LISPDATA_NIL;
-			} else if (t == 2) { //—v‘f‚ªˆê‚Â‚µ‚©‚È‚¢i—v‘f‚ÍƒŠƒXƒgj
+			} else if (t == 2) { //è¦ç´ ãŒä¸€ã¤ã—ã‹ãªã„ï¼ˆè¦ç´ ã¯ãƒªã‚¹ãƒˆï¼‰
 			    list[0] = makeLispData(newlist, q);
 			    list[1] = LISPDATA_NIL;
-			} else if (t == 6) { //“ñ‚Â–Ú‚Ì—v‘fiƒVƒ“ƒ{ƒ‹j‚Ì“o˜^
+			} else if (t == 6) { //äºŒã¤ç›®ã®è¦ç´ ï¼ˆã‚·ãƒ³ãƒœãƒ«ï¼‰ã®ç™»éŒ²
 			    list[1] = makeLispData(s.toUpperCase(), q);
-			} else if (t == 7) { //“ñ‚Â–Ú‚Ì—v‘fiƒŠƒXƒgj‚Ì“o˜^
+			} else if (t == 7) { //äºŒã¤ç›®ã®è¦ç´ ï¼ˆãƒªã‚¹ãƒˆï¼‰ã®ç™»éŒ²
 			    list[1] = makeLispData(newlist, q);
-			} else if ((t != 0) || (q != 0)) { // t==0 ‚Í‹ó‚ÌƒŠƒXƒg‚É‚È‚é
+			} else if ((t != 0) || (q != 0)) { // t==0 ã¯ç©ºã®ãƒªã‚¹ãƒˆã«ãªã‚‹
 			    debug("error char ')' t=" + t);
 				return str.length + 10;
 			}
 			return i;
 		
 		} else if (c == ' ') {
-			if (t == 1) { //ˆê‚Â–Ú‚Ì—v‘f
+			if (t == 1) { //ä¸€ã¤ç›®ã®è¦ç´ 
 			    list[0] = makeLispData(s.toUpperCase(), q);
 				t = 3;
-			} else if (t == 2) { //ˆê‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒg
+			} else if (t == 2) { //ä¸€ã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆ
 			    list[0] = makeLispData(newlist, q);
 				t = 3;
-			} else if (t == 4) { //Ÿ‚É‚­‚é‚Ì‚Í‚Q‚Â–Ú‚Ì—v‘f
+			} else if (t == 4) { //æ¬¡ã«ãã‚‹ã®ã¯ï¼’ã¤ç›®ã®è¦ç´ 
 				t = 5;
 			} else {
 			    debug("error char ' ' t=" + t);
 				return str.length + 10;
 			}
-			q = 0; //quoteÈ—ªƒtƒ‰ƒO‚Ì‰ğœ
+			q = 0; //quoteçœç•¥ãƒ•ãƒ©ã‚°ã®è§£é™¤
 			
 		} else if (c == '.') {
-			if (t == 3) { //‚±‚ÌƒŠƒXƒg‚Í—ª®‚Å‚È‚¢
+			if (t == 3) { //ã“ã®ãƒªã‚¹ãƒˆã¯ç•¥å¼ã§ãªã„
 				t = 4;
 			} else {
 			    debug("error char '.' t=" + t);
@@ -796,26 +796,26 @@ function hoge(str, p, list){
 			}
 			
 		} else {
-			if (t == 0) { //ˆê‚Â–Ú‚Ì—v‘f‚ÌƒVƒ“ƒ{ƒ‹ŠJn
+			if (t == 0) { //ä¸€ã¤ç›®ã®è¦ç´ ã®ã‚·ãƒ³ãƒœãƒ«é–‹å§‹
 			    if ((p == 0) && (c == ";") && (q == 0)) {
 			        list[0] = new LispData(null, str.substring(i), DATATYPE_COMMENT);
 			        debug("[Comment] "+list[0].getData());
 			        return str.length - i;
 			    }
 			    if (c == "'") {
-			        //quote‚ÌÈ—ª
+			        //quoteã®çœç•¥
 			        q++;
 			    } else {
     				s = c;
     				t = 1;
 			    }
-			} else if ((t == 1) || (t == 6)) { //ƒVƒ“ƒ{ƒ‹•¶š‚ª‘±‚­
+			} else if ((t == 1) || (t == 6)) { //ã‚·ãƒ³ãƒœãƒ«æ–‡å­—ãŒç¶šã
 				s += c;
-			} else if (t == 3) { // . ‚ªÈ—ª‚³‚ê‚Ä‚é‚Ì‚Å“ñ‚Â–Ú‚Ì—v‘f‚ÍƒŠƒXƒgi‚»‚ÌƒŠƒXƒg‚Ìˆê‚Â–Ú‚Ì—v‘f‚ªƒVƒ“ƒ{ƒ‹j
+			} else if (t == 3) { // . ãŒçœç•¥ã•ã‚Œã¦ã‚‹ã®ã§äºŒã¤ç›®ã®è¦ç´ ã¯ãƒªã‚¹ãƒˆï¼ˆãã®ãƒªã‚¹ãƒˆã®ä¸€ã¤ç›®ã®è¦ç´ ãŒã‚·ãƒ³ãƒœãƒ«ï¼‰
 				newlist = new Array();
 				i = hoge(str, i, newlist) - 1;
 				t = 7;
-			} else if (t == 5) { //“ñ‚Â–Ú‚Ì—v‘f‚ÌƒVƒ“ƒ{ƒ‹ŠJn
+			} else if (t == 5) { //äºŒã¤ç›®ã®è¦ç´ ã®ã‚·ãƒ³ãƒœãƒ«é–‹å§‹
 				s = c;
 				t = 6;
 			} else {
@@ -824,7 +824,7 @@ function hoge(str, p, list){
 			}
 		}
 	}
-	if (p != 0) { //Ä‹AŒÄ‚Ño‚µ‚Å•¶š—ñ‚ğ“Ç‚İæ‚èI‚í‚Á‚Ä‚µ‚Ü‚Á‚Ä‚¢‚é
+	if (p != 0) { //å†å¸°å‘¼ã³å‡ºã—ã§æ–‡å­—åˆ—ã‚’èª­ã¿å–ã‚Šçµ‚ã‚ã£ã¦ã—ã¾ã£ã¦ã„ã‚‹
 		return -1;
 	}
 	if (i > str.length + 1) {
@@ -842,7 +842,7 @@ function hoge(str, p, list){
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ƒŠƒXƒg‚Ì³®•\Œ»
+//  ãƒªã‚¹ãƒˆã®æ­£å¼è¡¨ç¾
 ///////////////////////////////////////////////////////////////////////////////////////
 function tenkai(list) {
     var s1, s2, tmp;
@@ -874,7 +874,7 @@ function tenkai(list) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ƒŠƒXƒg‚Ì—ª®•\Œ»
+//  ãƒªã‚¹ãƒˆã®ç•¥å¼è¡¨ç¾
 ///////////////////////////////////////////////////////////////////////////////////////
 function tenkai2(list, n) {
     var s1, s2, tmp;
@@ -933,7 +933,7 @@ function tenkai2(list, n) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ƒeƒXƒg—pŠÖ”
+//  ãƒ†ã‚¹ãƒˆç”¨é–¢æ•°
 ///////////////////////////////////////////////////////////////////////////////////////
 var debugmsg ="";
 var debugnest = 0;
@@ -1002,7 +1002,7 @@ function test() {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ƒŠƒXƒg‚ÌÀs
+//  ãƒªã‚¹ãƒˆã®å®Ÿè¡Œ
 ///////////////////////////////////////////////////////////////////////////////////////
 function hoge2(list) {
     var s, tmp, temp, result, func;
@@ -1013,17 +1013,17 @@ function hoge2(list) {
         } else if (SpecialForms[s]) {
             return SpecialForms[s];
         }
-        if (FixedFunctions[s]) { //ƒfƒtƒHƒ‹ƒg‚ÌŠÖ”‚â“Á•Ê®
+        if (FixedFunctions[s]) { //ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®é–¢æ•°ã‚„ç‰¹åˆ¥å¼
             return FixedFunctions[s];
         }
         tmp = CurrentVariableContainer.getVariableContainer(s);
         if (tmp != null) {
             return tmp.getVariable(s);
         }
-        //ƒVƒ“ƒ{ƒ‹‚©‚ç”’l‚â•Ï”‚âŠÖ”–¼‚È‚Ç‚É•ÏŠ·‚·‚éA‘Î‰‚·‚é‚à‚Ì‚ª–³‚¯‚ê‚ÎƒGƒ‰[
+        //ã‚·ãƒ³ãƒœãƒ«ã‹ã‚‰æ•°å€¤ã‚„å¤‰æ•°ã‚„é–¢æ•°åãªã©ã«å¤‰æ›ã™ã‚‹ã€å¯¾å¿œã™ã‚‹ã‚‚ã®ãŒç„¡ã‘ã‚Œã°ã‚¨ãƒ©ãƒ¼
         return makeError("Variable Error in hoge2", "Undefined by symbol: " + s);
     } else if (list.isFunction()) {
-        return makeError("Reference Error in hoge2","This is Function: " + list.getName()); //list‚ÍŠÖ”‚ÌÀ‘Ì‚È‚Ì‚ÅƒGƒ‰[
+        return makeError("Reference Error in hoge2","This is Function: " + list.getName()); //listã¯é–¢æ•°ã®å®Ÿä½“ãªã®ã§ã‚¨ãƒ©ãƒ¼
     } else if (list.isError()) {
         return list;
     } else if (list.getType() == DATATYPE_COMMENT) {
@@ -1041,7 +1041,7 @@ function hoge2(list) {
             outNowScope();
             return result;
         } else if (s.isUserFunction()) {
-            //ƒ†[ƒUŠÖ”
+            //ãƒ¦ãƒ¼ã‚¶é–¢æ•°
             result = doLambdaFunction(s, tmp[1]);
             outNowScope();
             return result;
@@ -1060,5 +1060,5 @@ function hoge2(list) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-//  ‚±‚Ìƒtƒ@ƒCƒ‹‚ÌI‚í‚è
+//  ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®çµ‚ã‚ã‚Š
 ///////////////////////////////////////////////////////////////////////////////////////

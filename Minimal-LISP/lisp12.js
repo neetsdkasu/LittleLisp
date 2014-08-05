@@ -1,10 +1,10 @@
 
     //------------------------------------------------------------------------- MinimalLISP
-    //  VariableManager                 •Ï”ƒ}ƒl[ƒWƒƒ
+    //  VariableManager                 å¤‰æ•°ãƒãƒãƒ¼ã‚¸ãƒ£
     //-------------------------------------------------------------------------------------
     //  LastUpdate      2013/06/17
     //  Version         1.0
-    //  Autoher         ‚¨‚ê‚¨‚ê (takeiteasy_idontthinkso)
+    //  Autoher         ãŠã‚ŒãŠã‚Œ (takeiteasy_idontthinkso)
     //-------------------------------------------------------------------------------------
     
     var VariableManager = new function () {
@@ -12,14 +12,14 @@
 
     
         //--------------------------------------------------------------------- VariableManager
-        //  VariableContainer          •Ï”ƒRƒ“ƒeƒi
+        //  VariableContainer          å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
         //-------------------------------------------------------------------------------------
         function VariableContainer(parent) {
             
-            //ƒRƒ“ƒeƒiID
+            //ã‚³ãƒ³ãƒ†ãƒŠID
             var id = nextVCID();
             
-            //QÆƒJƒEƒ“ƒ^
+            //å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿
             var referCount = 0;
             
             this.increaseReferCount = function () {
@@ -33,21 +33,21 @@
             
             this.NonReference = function () { return (referCount == 0); };
             
-            //•Ï”ƒf[ƒ^(LispData)‚ğŠi”[‚·‚é
+            //å¤‰æ•°ãƒ‡ãƒ¼ã‚¿(LispData)ã‚’æ ¼ç´ã™ã‚‹
             var vars = new Array();
     
-            //ƒRƒ“ƒeƒiID‚Ìæ“¾
+            //ã‚³ãƒ³ãƒ†ãƒŠIDã®å–å¾—
             this.getID = function () { return id; };
             
     
-            //eƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+            //è¦ªã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
             this.getParent = function () { return parent; };
     
-            //•Ï”‚ğæ“¾‚·‚é
+            //å¤‰æ•°ã‚’å–å¾—ã™ã‚‹
             this.getVariable = function (key) {
                 return vars[key].getData();
             }
-            //•Ï”‚ğİ’è‚·‚é
+            //å¤‰æ•°ã‚’è¨­å®šã™ã‚‹
             this.setVariable = function (key, data) {
                 if (vars[key]) {
                     vars[key].gc();
@@ -56,7 +56,7 @@
                 vars[key] = new LispData(key, data, DATATYPE_VARIABLE);
                 return vars[key];
             };
-            //•Ï”‚ğŠi”[‚·‚éƒRƒ“ƒeƒi‚ğæ“¾‚·‚é
+            //å¤‰æ•°ã‚’æ ¼ç´ã™ã‚‹ã‚³ãƒ³ãƒ†ãƒŠã‚’å–å¾—ã™ã‚‹
             this.getVariableContainer = function (key) {
                 if (vars[key]) {
                     return this;
@@ -68,7 +68,7 @@
                     }
                 }
             };
-            //ˆê•”•Ï”‚Ì‰ğ•ú
+            //ä¸€éƒ¨å¤‰æ•°ã®è§£æ”¾
             this.release = function () {
                 if (referCount == 0) {
                     this.gc();
@@ -78,11 +78,11 @@
                 for (i in vars) {
                     key = vars[i].getName();
                     if (parent.getVariableContainer(key) != null) {
-                        //lambda‚ÌƒNƒ[ƒWƒƒ‚É•ß”›‚³‚ê‚È‚¢
+                        //lambdaã®ã‚¯ãƒ­ãƒ¼ã‚¸ãƒ£ã«æ•ç¸›ã•ã‚Œãªã„
                         vars[i].gc();
                         vars[i] = null;
                     } else {
-                        c++; //•Û‚µ‚Ä‚é•Ï””
+                        c++; //ä¿æŒã—ã¦ã‚‹å¤‰æ•°æ•°
                     }
                 }
                 if (c == 0) {
@@ -90,8 +90,8 @@
                 }
                 return c;
             };
-            //ƒKƒx[ƒWƒRƒŒƒNƒg
-            this.gc = function () {  //Ä—˜—pŠ®‘S•s‰Â
+            //ã‚¬ãƒ™ãƒ¼ã‚¸ã‚³ãƒ¬ã‚¯ãƒˆ
+            this.gc = function () {  //å†åˆ©ç”¨å®Œå…¨ä¸å¯
                 var i;
                 for (i in vars) {
                     vars[i].gc();
@@ -103,11 +103,11 @@
         }
 
         /////////////////////////////////////////////////////////////////////// VariableManager
-        //  •Ï”ƒRƒ“ƒeƒi‚ÌŠÇ—
+        //  å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠã®ç®¡ç†
         ///////////////////////////////////////////////////////////////////////////////////////
 
 
-        var Containers = new Array(); //ƒRƒ“ƒeƒiƒŠƒXƒgi•ß”›ƒXƒR[ƒvQÆA‚¨‚æ‚Ñgc—pj
+        var Containers = new Array(); //ã‚³ãƒ³ãƒ†ãƒŠãƒªã‚¹ãƒˆï¼ˆæ•ç¸›ã‚¹ã‚³ãƒ¼ãƒ—å‚ç…§ã€ãŠã‚ˆã³gcç”¨ï¼‰
         
         var addNewContainer = function (parent) {
             var VC = new VariableContainer(parent);
@@ -131,7 +131,7 @@
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  removeAll               ‘S‚Ä‚Ì•Ï”‚ğíœ‚·‚éig—p‚Í—v’ˆÓj
+        //  removeAll               å…¨ã¦ã®å¤‰æ•°ã‚’å‰Šé™¤ã™ã‚‹ï¼ˆä½¿ç”¨ã¯è¦æ³¨æ„ï¼‰
         //-------------------------------------------------------------------------------------
         var removeAll = function () {
             for (i = 0; i < Containers.length; i++) {
@@ -150,7 +150,7 @@
         this.removeAll = removeAll;
 
         //--------------------------------------------------------------------- VariableManager
-        //  •Ï”ƒRƒ“ƒeƒi‚ÌID
+        //  å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠã®ID
         //-------------------------------------------------------------------------------------
         
         var CurrentVCID  = 0;
@@ -158,7 +158,7 @@
         var nextVCID = function () { return CurrentVCID++; };        
         
         /////////////////////////////////////////////////////////////////////// VariableManager
-        //  •Ï”‚ÌƒXƒR[ƒv‚ÌŠÇ—
+        //  å¤‰æ•°ã®ã‚¹ã‚³ãƒ¼ãƒ—ã®ç®¡ç†
         ///////////////////////////////////////////////////////////////////////////////////////
 
         var SCOPE_LEXICAL = 0;
@@ -168,22 +168,22 @@
         
         this.isLexical = function () { return (scope == SCOPE_LEXICAL); };
         this.isDynamic = function () { return (scope == SCOPE_DYNAMIC); };
-        this.setLexical = function () { scope = SCOPE_LEXICAL; removeAll(); }; //‘S‚Ä‚Ì•Ï”‚ªƒŠƒZƒbƒg‚³‚ê‚é‚Ì‚Å—v’ˆÓ
-        this.setDynamic = function () { scope = SCOPE_DYNAMIC; removeAll(); }; //‘S‚Ä‚Ì•Ï”‚ªƒŠƒZƒbƒg‚³‚ê‚é‚Ì‚Å—v’ˆÓ
+        this.setLexical = function () { scope = SCOPE_LEXICAL; removeAll(); }; //å…¨ã¦ã®å¤‰æ•°ãŒãƒªã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã®ã§è¦æ³¨æ„
+        this.setDynamic = function () { scope = SCOPE_DYNAMIC; removeAll(); }; //å…¨ã¦ã®å¤‰æ•°ãŒãƒªã‚»ãƒƒãƒˆã•ã‚Œã‚‹ã®ã§è¦æ³¨æ„
 
         
-        //ƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚Ì•Ï”ƒRƒ“ƒeƒi
+        //ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
         var GlobalVariableContainer = addNewContainer(null);
         
-        //Œ»İ‚ÌƒXƒR[ƒv‚Ì•Ï”ƒRƒ“ƒeƒi
+        //ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã®å¤‰æ•°ã‚³ãƒ³ãƒ†ãƒŠ
         var CurrentVariableContainer = GlobalVariableContainer;
         
-        //Ã“IƒXƒR[ƒv‚ÌLambdaŠÖ”‚È‚Ç•ÊƒXƒR[ƒvˆÚ“®—p
+        //é™çš„ã‚¹ã‚³ãƒ¼ãƒ—æ™‚ã®Lambdaé–¢æ•°ãªã©åˆ¥ã‚¹ã‚³ãƒ¼ãƒ—ç§»å‹•ç”¨
         var ContainerStack = new StackArray();
         
         
         //--------------------------------------------------------------------- VariableManager
-        //  getCurrentVariableContainerID       Œ»İ‚ÌƒRƒ“ƒeƒi‚ÌIDæ“¾
+        //  getCurrentVariableContainerID       ç¾åœ¨ã®ã‚³ãƒ³ãƒ†ãƒŠã®IDå–å¾—
         //-------------------------------------------------------------------------------------
         this.getCurrentVariableContainerID = function () {
             CurrentVariableContainer.increaseReferCount();
@@ -192,7 +192,7 @@
         
         
         //--------------------------------------------------------------------- VariableManager
-        //  getVariable             •Ï”‚Ìæ“¾
+        //  getVariable             å¤‰æ•°ã®å–å¾—
         //-------------------------------------------------------------------------------------
         this.getVariable = function (key) {
             var tmp;
@@ -205,14 +205,14 @@
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  setCurrentVariable          Œ»İ‚ÌƒXƒR[ƒv‚Ö‚Ì•Ï”‚Ìİ’è
+        //  setCurrentVariable          ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã¸ã®å¤‰æ•°ã®è¨­å®š
         //-------------------------------------------------------------------------------------
         this.setCurrentVariable = function (key, data) {
             CurrentVariableContainer.setVariable(key, data);
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  setBindVariable             key‚ªƒoƒCƒ“ƒh‚³‚ê‚Ä‚éÅŠñ‚ÌƒXƒR[ƒv‚Éã‘‚«
+        //  setBindVariable             keyãŒãƒã‚¤ãƒ³ãƒ‰ã•ã‚Œã¦ã‚‹æœ€å¯„ã®ã‚¹ã‚³ãƒ¼ãƒ—ã«ä¸Šæ›¸ã
         //-------------------------------------------------------------------------------------
         this.setBindVariable = function (key, data) {
             var tmp;
@@ -226,14 +226,14 @@
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  setGlobalVariable           ƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚Ö‚Ì•Ï”‚Ìİ’è
+        //  setGlobalVariable           ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã¸ã®å¤‰æ•°ã®è¨­å®š
         //-------------------------------------------------------------------------------------
         this.setGlobalVariable = function (key, data) {
             GlobalVariableContainer.setVariable(key, data);
         };
     
         //--------------------------------------------------------------------- VariableManager
-        //  setScopeGlobal              Œ»İ‚ÌƒXƒR[ƒv‚ğ‹­§“I‚ÉƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚É–ß‚·
+        //  setScopeGlobal              ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã‚’å¼·åˆ¶çš„ã«ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã«æˆ»ã™
         //-------------------------------------------------------------------------------------
         var setScopeGlobal = function () {
             CurrentVariableContainer = GlobalVariableContainer;
@@ -241,7 +241,7 @@
         this.setScopeGlobal = setScopeGlobal;
     
         //--------------------------------------------------------------------- VariableManager
-        //  intoNewNest                 V‚µ‚¢ƒXƒR[ƒv‚ÌƒlƒXƒg‚É“ü‚é
+        //  intoNewNest                 æ–°ã—ã„ã‚¹ã‚³ãƒ¼ãƒ—ã®ãƒã‚¹ãƒˆã«å…¥ã‚‹
         //-------------------------------------------------------------------------------------
         var intoNewNest = function () {
             CurrentVariableContainer = addNewContainer(CurrentVariableContainer);
@@ -249,7 +249,7 @@
         this.intoNewNest = intoNewNest;
     
         //--------------------------------------------------------------------- VariableManager
-        //  outNowNest                 Œ»İ‚ÌƒXƒR[ƒv‚©‚ç”²‚¯‚é
+        //  outNowNest                 ç¾åœ¨ã®ã‚¹ã‚³ãƒ¼ãƒ—ã‹ã‚‰æŠœã‘ã‚‹
         //-------------------------------------------------------------------------------------
         this.outNowScope = function () {
             var tmp = CurrentVariableContainer;
@@ -261,13 +261,13 @@
                 }
             } else {
                 setScopeGlobal();
-                return false; //eƒXƒR[ƒv‚ª–³‚¢‚Ì‚ÉƒXƒR[ƒv‚©‚ç”²‚¯‚é‚Ì‚ÍˆÙíˆ—
+                return false; //è¦ªã‚¹ã‚³ãƒ¼ãƒ—ãŒç„¡ã„ã®ã«ã‚¹ã‚³ãƒ¼ãƒ—ã‹ã‚‰æŠœã‘ã‚‹ã®ã¯ç•°å¸¸å‡¦ç†
             }
             return true;
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  jumptoScope                 Ã“IƒXƒR[ƒv‚È‚çƒJƒŒƒ“ƒgƒXƒR[ƒv‚ğ•ß”›ƒXƒR[ƒv‚ÖˆÚ“®
+        //  jumptoScope                 é™çš„ã‚¹ã‚³ãƒ¼ãƒ—æ™‚ãªã‚‰ã‚«ãƒ¬ãƒ³ãƒˆã‚¹ã‚³ãƒ¼ãƒ—ã‚’æ•ç¸›ã‚¹ã‚³ãƒ¼ãƒ—ã¸ç§»å‹•
         //-------------------------------------------------------------------------------------
         this.jumptoScope = function (closedVCID) {
             if (scope == SCOPE_LEXICAL) {
@@ -279,25 +279,25 @@
                     return false;
                 }
             } else {
-                return true; //“®“IƒXƒR[ƒv‚È‚çˆ—‚È‚µ
+                return true; //å‹•çš„ã‚¹ã‚³ãƒ¼ãƒ—ãªã‚‰å‡¦ç†ãªã—
             }
         };
         
         //--------------------------------------------------------------------- VariableManager
-        //  returnScope                 Ã“IƒXƒR[ƒv‚È‚ç•ß”›ƒXƒR[ƒv‚©‚çŒ³‚ÌƒXƒR[ƒv‚Ö–ß‚é
+        //  returnScope                 é™çš„ã‚¹ã‚³ãƒ¼ãƒ—æ™‚ãªã‚‰æ•ç¸›ã‚¹ã‚³ãƒ¼ãƒ—ã‹ã‚‰å…ƒã®ã‚¹ã‚³ãƒ¼ãƒ—ã¸æˆ»ã‚‹
         //-------------------------------------------------------------------------------------
         this.returnScope = function () {
             if (scope == SCOPE_LEXICAL) {
                 if (ContainerStack.size() > 0) {
-                    //ƒXƒ^ƒbƒN‚É‘Ş”ğ‚µ‚Ä‚¢‚½ƒXƒR[ƒv‚ğ–ß‚·
+                    //ã‚¹ã‚¿ãƒƒã‚¯ã«é€€é¿ã—ã¦ã„ãŸã‚¹ã‚³ãƒ¼ãƒ—ã‚’æˆ»ã™
                     CurrentVariableContainer = ContainerStack.pop();
                 } else {
-                    //–{—ˆˆÙíˆ—‚¾‚ªA”O‚Ì‚½‚ßƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚É–ß‚·
+                    //æœ¬æ¥ç•°å¸¸å‡¦ç†ã ãŒã€å¿µã®ãŸã‚ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã«æˆ»ã™
                     setScopeGlobal();
-                    return false; //ˆÈãˆ—‚È‚Ì‚Åfalse
+                    return false; //ä»¥ä¸Šå‡¦ç†ãªã®ã§false
                 }
-            } //“®“IƒXƒR[ƒv‚È‚çˆ—‚È‚µ
+            } //å‹•çš„ã‚¹ã‚³ãƒ¼ãƒ—ãªã‚‰å‡¦ç†ãªã—
             return true;
         };
     
-    };//VariableManager‚Ì’è‹`‚¨‚í‚è
+    };//VariableManagerã®å®šç¾©ãŠã‚ã‚Š

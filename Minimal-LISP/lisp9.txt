@@ -1,7 +1,7 @@
-ƒlisp˜_•¶‚æ‚èeval
+ç´”lispè«–æ–‡ã‚ˆã‚Ševal
 
-eq‚ÍƒVƒ“ƒ{ƒ‹“¯Žm‚Ì•]‰¿‚µ‚©‚Å‚«‚È‚¢Aˆø”‚ÉƒŠƒXƒg‚ª—ˆ‚é‚ÆƒGƒ‰[
-;list[e1;e2;e3;...en] ‚Í cons[e1;cons[e2;cons[e3;...cons[en]]]] ‚É’u‚«Š·‚¦‚Äl‚¦‚ë‚Æ‹LÚ‚³‚ê‚Ä‚éEEE
+eqã¯ã‚·ãƒ³ãƒœãƒ«åŒå£«ã®è©•ä¾¡ã—ã‹ã§ããªã„ã€å¼•æ•°ã«ãƒªã‚¹ãƒˆãŒæ¥ã‚‹ã¨ã‚¨ãƒ©ãƒ¼
+;list[e1;e2;e3;...en] ã¯ cons[e1;cons[e2;cons[e3;...cons[en]]]] ã«ç½®ãæ›ãˆã¦è€ƒãˆã‚ã¨è¨˜è¼‰ã•ã‚Œã¦ã‚‹ãƒ»ãƒ»ãƒ»
 
 (label caar (lambda (x) (car (car x))))
 (label caaar (lambda (x) (car (car (car x)))))
