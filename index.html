@@ -49,7 +49,7 @@ All coments are in Japanese.
 </table>
 <ol>
  <li>Closure is OK.<br>e.g.<br><span>; closure variable x in f<br>(label f ((lambda () (cond ((label x 'foo) (lambda () (cons x x)))))))<br>; (f) result (FOO . FOO)<br>(f)<br> ; next code is error (x is not found in global)<br>(cons x x)</span></li>
- <li>except LABEL, DEFINE, LAMBDA, COND and head of list.<br>e.g.<br><span>(label f (lambda (x) (cons x 'foo)))<br>(define g (lambda (y) (cons y 'bar)))<br>(cond ('t (lambda (z) (cons z 'baz))))<br>(lambda () (lambda (x) (cons x x)))<br>((lambda (a) a) 'b)</span></li>
+ <li>except LABEL, DEFINE, LAMBDA, COND and head of list.<br>e.g.<br><span>(label f (lambda (x) (cons x 'foo)))<br>(define g (lambda (y) (cons y 'bar)))<br>(cond ('t (lambda (z) (cons z 'baz))))<br>(lambda () (lambda (x) (cons x x)))<br>((lambda (a) a) 'b)<br>; combinate<br>(label h (lambda (x) (cond ((eq x 'f) f) ('t g))))<br>((h 'f) 'abc) ; (ABC . FOO)</span></li>
  <li>place LAMBDA list on head of list. <br>e.g.<br><span>(label list (lambda x x))<br>((list 'lambda '(x) (list 'cons 'x 'x)) 'foo) ; (FOO . FOO) </span></li>
  <li>e.g.<br><span>(cons<br> 'a<br> 'b) ; 1 code over multi-line. </span></li>
  <li>e.g.<br><span>(cons 'a 'b) (cons 'x 'y) ; 2 codes in 1 line.</span></li>
