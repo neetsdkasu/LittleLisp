@@ -40,7 +40,7 @@ All coments are in Japanese.
 <table border="1">
  <tr><th></th><th>Minimal-LISP</th><th>SukunaLISP</th><th>JunLISP</th></tr>
  <tr><td>Scope</td><td>Hybrid *1<br>(Lexical &amp; Dynamic)</td><td>Dynamic</td><td>Dynamic</td></tr>
- <tr><td>First-Class<br>Function</td><td>Yes</td><td>No *2</td><td>Yes</td></tr>
+ <tr><td>First-Class Function</td><td>Yes</td><td>No *2</td><td>Yes</td></tr>
  <tr><td>Macro</td><td>No</td><td>No</td><td>Yes *3</td></tr>
  <tr><td>1 code<br>over multi-line *4</td><td>No</td><td>Yes</td><td>Yes</td></tr>
  <tr><td>multi-code in 1 line *5</td><td>No</td><td>Yes</td><td>Yes</td></tr>
@@ -52,8 +52,8 @@ All coments are in Japanese.
  <li>except LABEL, DEFINE, COND and head of list.</li>
  <li>place LAMBDA list on head of list.  e.g.<span>((cons 'lambda (cons '(x) (cons (cons 'cons (cons 'x (cons 'x ()))) ()))) 'a) ; (A . A)</span></li>
  <li>e.g.<br><span>(cons<br> 'a<br> 'b)</span></li>
- <li>e.g. <span>(cons 'a 'b) (cons 'x 'y)</span></li>
- <li>e.g. <span>(cons 'a 'b) ; here comment</span></li>
+ <li>e.g.<br><span>(cons 'a 'b) (cons 'x 'y)</span></li>
+ <li>e.g.<br><span>(cons 'a 'b) ; here comment</span></li>
 </ol>
  
 <hr>
