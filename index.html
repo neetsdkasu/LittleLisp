@@ -51,9 +51,9 @@ All coments are in Japanese.
  <li>Closure is OK.<br>e.g.<br><span>(label last (lambda (xs) (cond ((cdr xs) (last (cdr xs))) ('T (car xs)))))<br>(label do (lambda (x . xs) (last (cons x xs))))<br>(label f ((lambda () (do (label x 'foo) (lambda () (cons x x))))))<br>(f) ; (FOO . FOO)<br>(cons x x) ; error (x is not found)</span></li>
  <li>except LABEL, DEFINE, COND and head of list.<br>e.g.<br><span>(label f (lambda (x) x))<br>(define g (lambda (y) y))<br>(cond ('t (lambda (z) z)))<br>((lambda (a) a) 'b)</span></li>
  <li>place LAMBDA list on head of list. <br>e.g.<br><span>(label list (lambda x x))<br>((list 'lambda '(x) (list 'cons 'x 'x)) 'foo) ; (FOO . FOO) </span></li>
- <li>e.g.<br><span>(cons<br> 'a<br> 'b)</span></li>
- <li>e.g.<br><span>(cons 'a 'b) (cons 'x 'y)</span></li>
- <li>e.g.<br><span>(cons 'a 'b) ; comment here</span></li>
+ <li>e.g.<br><span>(cons<br> 'a<br> 'b) ; 1 code over multi-line. </span></li>
+ <li>e.g.<br><span>(cons 'a 'b) (cons 'x 'y) ; 2 codes in 1 line.</span></li>
+ <li>e.g.<br><span>(cons 'a 'b) ; comment here.</span></li>
 </ol>
  
 <hr>
