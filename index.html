@@ -42,18 +42,18 @@ All coments are in Japanese.
  <tr><td>Scope</td><td>Hybrid *1<br>(Lexical &amp; Dynamic)</td><td>Dynamic</td><td>Dynamic</td></tr>
  <tr><td>First-Class Function</td><td>Yes</td><td>No *2</td><td>Yes</td></tr>
  <tr><td>Macro</td><td>No</td><td>No</td><td>Yes *3</td></tr>
- <tr><td>1 code<br>over multi-line *4</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+ <tr><td>1 code over multi-line *4</td><td>No</td><td>Yes</td><td>Yes</td></tr>
  <tr><td>multi-code in 1 line *5</td><td>No</td><td>Yes</td><td>Yes</td></tr>
  <tr><td>with comment *6</td><td>No</td><td>Yes</td><td>Yes</td></tr>
  <tr><td></td><td></td><td></td><td></td></tr>
 </table>
 <ol>
- <li>Closure is OK.</li>
- <li>except LABEL, DEFINE, COND and head of list.</li>
- <li>place LAMBDA list on head of list.  e.g.<span>((cons 'lambda (cons '(x) (cons (cons 'cons (cons 'x (cons 'x ()))) ()))) 'a) ; (A . A)</span></li>
+ <li>Closure is OK.<br>e.g.<br><span>(label last (lambda (xs) (cond ((cdr xs) (last (cdr xs))) ('T (car xs)))))<br>(label do (lambda (x . xs) (last (cons x xs))))<br>(label f ((lambda () (do (label x 'foo) (lambda () (cons x x))))))<br>(f) ; (FOO . FOO)<br>(cons x x) ; error (x is not found)</span></li>
+ <li>except LABEL, DEFINE, COND and head of list.<br>e.g.<br><span>(label f (lambda (x) x))<br>(define g (lambda (y) y))<br>(cond ('t (lambda (z) z)))<br>((lambda (a) a) 'b)</span></li>
+ <li>place LAMBDA list on head of list. <br>e.g.<br><span>((cons 'lambda (cons '(x) (cons (cons 'cons (cons 'x (cons 'x ()))) ()))) 'a) ; (A . A)</span></li>
  <li>e.g.<br><span>(cons<br> 'a<br> 'b)</span></li>
  <li>e.g.<br><span>(cons 'a 'b) (cons 'x 'y)</span></li>
- <li>e.g.<br><span>(cons 'a 'b) ; here comment</span></li>
+ <li>e.g.<br><span>(cons 'a 'b) ; comment here</span></li>
 </ol>
  
 <hr>
